@@ -1,0 +1,23 @@
+{
+  "$kind": "http-request",
+  "order": 6000,
+  "method": "POST",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/transactions",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 200', () => pm.response.to.have.status(200));\n\n"
+    }
+  ],
+  "headers": [
+    {
+      "key": "Content-Type",
+      "value": "application/json"
+    }
+  ],
+  "body": {
+    "type": "json",
+    "content": "{\n  \"id\": \"{{expense_id}}\",\n  \"type\": \"expense\",\n  \"amount_minor\": \"125050\",\n  \"category_id\": \"{{expense_category}}\",\n  \"occurred_on\": \"{{today}}\",\n  \"note\": \"Продукты на неделю\"\n}"
+  }
+}

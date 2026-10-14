@@ -1,0 +1,23 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/api/v1/profiles/:p/transactions/:id?version=3647"
+method: DELETE
+headers:
+  Accept: application/json
+queryParams:
+  - key: version
+    value: "3647"
+    disabled: false
+    description: "(Required) "
+pathVariables:
+  - key: p
+    value: a494a5ed-d787-ac66-08a5-a9985035873e
+    disabled: false
+    description: "(Required) "
+  - key: id
+    value: 22fd1573-9884-8bcf-1ec1-2cad9381e413
+    disabled: false
+    description: "(Required) "
+settings: {}
+examples: ./.resources/Delete Transaction.resources/examples
+order: 5000

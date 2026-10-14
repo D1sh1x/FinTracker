@@ -1,0 +1,41 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/v1/profiles/:p/transactions/:id"
+  method: GET
+  headers:
+    Accept: application/json
+  pathVariables:
+    - key: p
+      value: a494a5ed-d787-ac66-08a5-a9985035873e
+      disabled: false
+      description: "(Required) "
+    - key: id
+      value: 22fd1573-9884-8bcf-1ec1-2cad9381e413
+      disabled: false
+      description: "(Required) "
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "id": "30b13d42-ba0f-473d-a490-1423f5b0534a",
+        "profile_id": "8decf0d5-7c74-0a35-d2ac-b65247605a3f",
+        "wallet_id": "2e95941f-7437-e537-75e9-571e8aeadd35",
+        "category_id": "04bd646d-ace9-a68d-7a06-08fa7e4d1376",
+        "type": "expense",
+        "amount_minor": "string",
+        "occurred_on": "2015-04-28",
+        "note": "string",
+        "source": "string",
+        "version": 7980,
+        "created_at": "1975-12-19T02:16:08.545Z",
+        "updated_at": "1989-05-16T13:17:09.002Z"
+      }
+order: 1000

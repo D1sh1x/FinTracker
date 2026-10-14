@@ -1,0 +1,19 @@
+$kind: http-request
+name: Лимиты и расходы категорий за месяц
+description: Месяц YYYY-MM. Пустой список лимитов не является ошибкой; категории без лимита имеют null. Расчёты и общий лимит читаются из одного снимка базы данных. Чужой/неизвестный профиль возвращает 404.
+url: "{{baseUrl}}/api/v1/profiles/:p/category-budgets/:month"
+method: GET
+headers:
+  Accept: application/json
+pathVariables:
+  - key: p
+    value: a494a5ed-d787-ac66-08a5-a9985035873e
+    disabled: false
+    description: "(Required) "
+  - key: month
+    value: 0576-01
+    disabled: false
+    description: "(Required) "
+settings: {}
+examples: ./.resources/Лимиты и расходы категорий за меся.resources/examples
+order: 1000

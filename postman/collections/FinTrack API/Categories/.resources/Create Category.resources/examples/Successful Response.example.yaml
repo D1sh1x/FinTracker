@@ -1,0 +1,39 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/v1/profiles/:p/categories"
+  method: POST
+  headers:
+    Accept: application/json
+  pathVariables:
+    - key: p
+      value: a494a5ed-d787-ac66-08a5-a9985035873e
+      disabled: false
+      description: "(Required) "
+  body:
+    type: json
+    content: |-
+      {
+        "id": "a580695b-d119-5a16-430f-77ccdd936105",
+        "name": "string",
+        "type": "income",
+        "icon": "heart",
+        "color": "#16925A"
+      }
+response:
+  statusCode: 201
+  statusText: Created
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "id": "1aad8cac-d438-988f-0137-c6d75ded8cae",
+        "profile_id": "773bc74b-104a-b176-5b26-b19bc8bf4b87",
+        "name": "string",
+        "type": "expense",
+        "icon": "string",
+        "color": "string",
+        "is_archived": false
+      }
+order: 1000

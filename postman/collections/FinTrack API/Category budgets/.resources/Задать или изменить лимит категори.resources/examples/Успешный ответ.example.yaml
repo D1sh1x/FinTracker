@@ -1,0 +1,43 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/v1/profiles/:p/category-budgets/:month/:id"
+  method: PUT
+  headers:
+    Accept: application/json
+  pathVariables:
+    - key: p
+      value: a494a5ed-d787-ac66-08a5-a9985035873e
+      disabled: false
+      description: "(Required) "
+    - key: month
+      value: 0576-01
+      disabled: false
+      description: "(Required) "
+    - key: id
+      value: 092bd59c-7903-bfe9-6b8d-1b3e90e0d0c9
+      disabled: false
+      description: (Required) UUID расходной категории этого профиля
+  body:
+    type: json
+    content: |-
+      {
+        "limit_minor": "9418",
+        "version": 966
+      }
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "id": "3ac1260d-00c9-f7f6-dc53-4147a17214b1",
+        "profile_id": "0d5912dd-833e-9356-ac82-7325346dd6c8",
+        "month": "string",
+        "limit_minor": "string",
+        "version": 4481,
+        "category_id": "3d9b8e0a-9547-8585-bea5-2114019a1287"
+      }
+order: 1000

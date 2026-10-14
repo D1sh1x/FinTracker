@@ -1,0 +1,23 @@
+{
+  "$kind": "http-request",
+  "order": 13000,
+  "method": "PATCH",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/transactions/{{expense_id}}",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 200', () => pm.response.to.have.status(200));\n\npm.test('Version incremented', () => pm.expect(pm.response.json().version).to.equal(2));"
+    }
+  ],
+  "headers": [
+    {
+      "key": "Content-Type",
+      "value": "application/json"
+    }
+  ],
+  "body": {
+    "type": "json",
+    "content": "{\n  \"amount_minor\": \"100000\",\n  \"version\": 1\n}"
+  }
+}

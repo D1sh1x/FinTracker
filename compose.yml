@@ -1,0 +1,87 @@
+name: fintrack
+
+services:
+  db:
+    image: postgres:18@sha256:74935e72241653ca55e0414067e6d8763aceb8a810eb51b452253ec3dcfc4336
+    environment:
+      POSTGRES_USER: fintrack
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: fintrack_go
+    volumes:
+      - database:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fintrack -d fintrack_go"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+    logging: &logging
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+  migrate:
+    build: { context: ., dockerfile: infra/backend.Dockerfile }
+    environment: &api_environment
+      DATABASE_URL: postgres://fintrack:${POSTGRES_PASSWORD}@db:5432/fintrack_go
+    command: ["/app/fintrack", "migrate"]
+    depends_on:
+      db: { condition: service_healthy }
+    logging: *logging
+
+  api:
+    build: { context: ., dockerfile: infra/backend.Dockerfile }
+    environment: *api_environment
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8000/health/ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    read_only: true
+    restart: unless-stopped
+    logging: *logging
+
+  frontend:
+    build: { context: ., dockerfile: infra/frontend.Dockerfile }
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+    ports:
+      - "${HTTP_BIND:-127.0.0.1}:${HTTP_PORT:-8088}:80"
+      - "${HTTP_BIND:-127.0.0.1}:${HTTPS_PORT:-8443}:443"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      api: { condition: service_healthy }
+    restart: unless-stopped
+    logging: *logging
+
+  backup:
+    image: postgres:18@sha256:74935e72241653ca55e0414067e6d8763aceb8a810eb51b452253ec3dcfc4336
+    environment:
+      PGHOST: db
+      PGUSER: fintrack
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: fintrack_go
+    entrypoint: ["/bin/sh"]
+    command: ["/scripts/backup-loop.sh"]
+    volumes:
+      - ./infra/backup.sh:/scripts/backup.sh:ro
+      - ./infra/backup-loop.sh:/scripts/backup-loop.sh:ro
+      - ./backups:/backups
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /backups/last-success && test ! -f /backups/last-error && test -n \"$$(find /backups -maxdepth 1 -name last-success -mmin -1560 -print)\""]
+      interval: 60s
+      timeout: 5s
+      retries: 1
+      start_period: 30s
+    restart: unless-stopped
+    logging: *logging
+
+volumes:
+  database:
+  caddy_data:
+  caddy_config:

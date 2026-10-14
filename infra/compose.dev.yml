@@ -1,0 +1,18 @@
+services:
+  db:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: fintrack
+      POSTGRES_PASSWORD: fintrack
+      POSTGRES_DB: fintrack_go
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - dev_db:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fintrack -d fintrack_go"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+volumes:
+  dev_db:

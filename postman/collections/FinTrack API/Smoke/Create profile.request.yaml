@@ -1,0 +1,28 @@
+{
+  "$kind": "http-request",
+  "order": 1000,
+  "method": "POST",
+  "url": "{{baseUrl}}/api/v1/profiles",
+  "scripts": [
+    {
+      "type": "beforeRequest",
+      "language": "text/javascript",
+      "code": "['profile_id','income_id','expense_id','other_profile','other_expense','invalid_id'].forEach(key => pm.collectionVariables.set(key, pm.variables.replaceIn('{{$guid}}'))); const today = new Date(Date.now() + 3*60*60*1000).toISOString().slice(0,10); pm.collectionVariables.set('today', today); pm.collectionVariables.set('month', today.slice(0,7));"
+    },
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 201', () => pm.response.to.have.status(201));\n\n"
+    }
+  ],
+  "headers": [
+    {
+      "key": "Content-Type",
+      "value": "application/json"
+    }
+  ],
+  "body": {
+    "type": "json",
+    "content": "{\n  \"id\": \"{{profile_id}}\",\n  \"name\": \"Проверка API\"\n}"
+  }
+}

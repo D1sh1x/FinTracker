@@ -1,0 +1,13 @@
+{
+  "$kind": "http-request",
+  "order": 16000,
+  "method": "GET",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/summary?month={{month}}",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 200', () => pm.response.to.have.status(200));\n\npm.test('Removed expense is excluded', () => { const result=pm.response.json(); pm.expect(result.balance_minor).to.equal('4000000'); pm.expect(result.expense_minor).to.equal('0'); pm.expect(result.budget.remaining_minor).to.equal('2000000'); });"
+    }
+  ]
+}

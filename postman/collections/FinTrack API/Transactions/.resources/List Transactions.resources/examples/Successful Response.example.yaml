@@ -1,0 +1,65 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/v1/profiles/:p/transactions?date_from=1951-05-07&date_to=1951-05-07&type=expense&category_id=092bd59c-7903-bfe9-6b8d-1b3e90e0d0c9&q=&cursor=string&limit=50"
+  method: GET
+  headers:
+    Accept: application/json
+  queryParams:
+    date_from: 1951-05-07
+    date_to: 1951-05-07
+    type: expense
+    category_id: 092bd59c-7903-bfe9-6b8d-1b3e90e0d0c9
+    q: ""
+    cursor: string
+    limit: "50"
+  pathVariables:
+    - key: p
+      value: a494a5ed-d787-ac66-08a5-a9985035873e
+      disabled: false
+      description: "(Required) "
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "items": [
+          {
+            "id": "0d171da0-31fa-8b93-0864-414665de6416",
+            "profile_id": "44ae1658-ced5-0bae-f94b-ad9f5f3bf5d6",
+            "wallet_id": "9571f8b1-edee-820a-7fcf-c247c9c1aa07",
+            "category_id": "5f55b0f4-845d-a3b1-6c29-20e1aadbbb60",
+            "type": "income",
+            "amount_minor": "string",
+            "occurred_on": "1960-03-24",
+            "note": "string",
+            "source": "string",
+            "version": 5453,
+            "created_at": "1995-08-06T22:27:23.401Z",
+            "updated_at": "1947-07-03T19:54:48.852Z"
+          },
+          {
+            "id": "13058ffa-ca26-d223-0c82-2a7b04ba4591",
+            "profile_id": "8e5084b7-cd27-1bb6-c2bc-629c3009b3c5",
+            "wallet_id": "e957e300-005a-4975-acc3-09c413ac9ef6",
+            "category_id": "c4052934-e764-6ebb-a92b-5fbe151d5d02",
+            "type": "income",
+            "amount_minor": "string",
+            "occurred_on": "2017-10-29",
+            "note": "string",
+            "source": "string",
+            "version": 8936,
+            "created_at": "1954-06-24T08:35:35.751Z",
+            "updated_at": "1992-10-02T06:02:03.713Z"
+          }
+        ],
+        "next_cursor": "string",
+        "has_more": false
+      }
+order: 1000

@@ -1,0 +1,38 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/v1/profiles"
+  method: GET
+  headers:
+    Accept: application/json
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "items": [
+          {
+            "id": "f9416dd6-9ad9-1a34-ee5b-73bc77f39eb9",
+            "name": "string",
+            "timezone": "string",
+            "currency": "string",
+            "created_at": "1994-08-21T16:56:59.968Z",
+            "updated_at": "2003-10-09T10:41:58.286Z"
+          },
+          {
+            "id": "c042f9fc-35f3-cc7d-f797-e42b0687ace6",
+            "name": "string",
+            "timezone": "string",
+            "currency": "string",
+            "created_at": "1959-12-26T09:56:28.378Z",
+            "updated_at": "1987-05-15T12:44:00.500Z"
+          }
+        ]
+      }
+order: 1000

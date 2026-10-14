@@ -1,0 +1,23 @@
+{
+  "$kind": "http-request",
+  "order": 3000,
+  "method": "PATCH",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/wallet",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 200', () => pm.response.to.have.status(200));\n\n"
+    }
+  ],
+  "headers": [
+    {
+      "key": "Content-Type",
+      "value": "application/json"
+    }
+  ],
+  "body": {
+    "type": "json",
+    "content": "{\n  \"opening_balance_minor\": \"1000000\",\n  \"version\": 1\n}"
+  }
+}

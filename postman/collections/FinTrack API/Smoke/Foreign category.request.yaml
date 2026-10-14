@@ -1,0 +1,23 @@
+{
+  "$kind": "http-request",
+  "order": 12000,
+  "method": "POST",
+  "url": "{{baseUrl}}/api/v1/profiles/{{other_profile}}/transactions",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 404', () => pm.response.to.have.status(404));\npm.test('Structured error', () => { const e=pm.response.json().error; pm.expect(e.code).to.be.a('string'); pm.expect(e.request_id).to.be.a('string'); });\n"
+    }
+  ],
+  "headers": [
+    {
+      "key": "Content-Type",
+      "value": "application/json"
+    }
+  ],
+  "body": {
+    "type": "json",
+    "content": "{\n  \"id\": \"{{other_expense}}\",\n  \"type\": \"expense\",\n  \"amount_minor\": \"125050\",\n  \"category_id\": \"{{expense_category}}\",\n  \"occurred_on\": \"{{today}}\",\n  \"note\": \"Продукты на неделю\"\n}"
+  }
+}

@@ -1,0 +1,46 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/v1/profiles/:p/transactions/:id"
+  method: PATCH
+  headers:
+    Accept: application/json
+  pathVariables:
+    - key: p
+      value: a494a5ed-d787-ac66-08a5-a9985035873e
+      disabled: false
+      description: "(Required) "
+    - key: id
+      value: 22fd1573-9884-8bcf-1ec1-2cad9381e413
+      disabled: false
+      description: "(Required) "
+  body:
+    type: json
+    content: |-
+      {
+        "version": 82,
+        "type": "expense",
+        "amount_minor": "50954",
+        "category_id": "f80be72b-820c-5aa9-0f62-bf2256d6afe5",
+        "occurred_on": "2026-10-06",
+        "note": "string"
+      }
+response:
+  statusCode: 503
+  statusText: Service Unavailable
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "error": {
+          "code": "string",
+          "message": "string",
+          "request_id": "string",
+          "fields": {
+            "key_0": "string",
+            "key_1": "string"
+          }
+        }
+      }
+order: 8000

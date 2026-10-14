@@ -1,0 +1,10 @@
+{
+  "$kind": "collection",
+  "name": "FinTrack API",
+  "variables": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000"
+    }
+  ]
+}

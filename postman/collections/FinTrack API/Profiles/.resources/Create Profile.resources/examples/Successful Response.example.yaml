@@ -1,0 +1,31 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/v1/profiles"
+  method: POST
+  headers:
+    Accept: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "id": "ca20c78b-df94-bf93-b379-c166f6d84ca8",
+        "name": "string",
+        "timezone": "Europe/Moscow"
+      }
+response:
+  statusCode: 201
+  statusText: Created
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "id": "8037bbe9-09cd-54c6-b0db-d040fef92adc",
+        "name": "string",
+        "timezone": "string",
+        "currency": "string",
+        "created_at": "1962-07-17T12:10:15.066Z",
+        "updated_at": "1993-10-14T23:31:48.065Z"
+      }
+order: 1000

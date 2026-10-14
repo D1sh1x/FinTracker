@@ -1,0 +1,6 @@
+services:
+  frontend:
+    environment:
+      BASIC_AUTH_HASH: ${BASIC_AUTH_HASH:?Set BASIC_AUTH_HASH to enable shared login}
+    volumes:
+      - ./infra/access.auth.caddy:/etc/caddy/access.caddy:ro

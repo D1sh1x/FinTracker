@@ -1,0 +1,20 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/api/v1/profiles/:p/exports/transactions.csv?date_from=1951-05-07&date_to=1951-05-07&type=expense&category_id=092bd59c-7903-bfe9-6b8d-1b3e90e0d0c9&q="
+method: GET
+headers:
+  Accept: text/csv
+queryParams:
+  date_from: 1951-05-07
+  date_to: 1951-05-07
+  type: expense
+  category_id: 092bd59c-7903-bfe9-6b8d-1b3e90e0d0c9
+  q: ""
+pathVariables:
+  - key: p
+    value: a494a5ed-d787-ac66-08a5-a9985035873e
+    disabled: false
+    description: "(Required) "
+settings: {}
+examples: ./.resources/Export Transactions.resources/examples
+order: 1000

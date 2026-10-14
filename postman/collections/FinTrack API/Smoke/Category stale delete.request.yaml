@@ -1,0 +1,13 @@
+{
+  "$kind": "http-request",
+  "order": 22000,
+  "method": "DELETE",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/category-budgets/{{month}}/{{expense_category}}?version=1",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 409', () => pm.response.to.have.status(409));\npm.test('Structured error', () => { const e=pm.response.json().error; pm.expect(e.code).to.be.a('string'); pm.expect(e.request_id).to.be.a('string'); });\n"
+    }
+  ]
+}

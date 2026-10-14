@@ -1,0 +1,61 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/v1/profiles/:p/category-budgets/:month"
+  method: GET
+  headers:
+    Accept: application/json
+  pathVariables:
+    - key: p
+      value: a494a5ed-d787-ac66-08a5-a9985035873e
+      disabled: false
+      description: "(Required) "
+    - key: month
+      value: 0576-01
+      disabled: false
+      description: "(Required) "
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "month": "string",
+        "items": [
+          {
+            "category_id": "0983c7f2-1778-3245-de76-3645d9941164",
+            "name": "string",
+            "icon": "string",
+            "color": "string",
+            "is_archived": true,
+            "limit_minor": "string",
+            "version": 5452,
+            "spent_minor": "string",
+            "remaining_minor": "string",
+            "overspent_minor": "string",
+            "used_percent": "string"
+          },
+          {
+            "category_id": "5631fe85-5ede-2b15-1871-9f973523b6c8",
+            "name": "string",
+            "icon": "string",
+            "color": "string",
+            "is_archived": false,
+            "limit_minor": "string",
+            "version": 7869,
+            "spent_minor": "string",
+            "remaining_minor": "string",
+            "overspent_minor": "string",
+            "used_percent": "string"
+          }
+        ],
+        "allocated_minor": "string",
+        "overall_limit_minor": "string",
+        "exceeds_overall": true
+      }
+order: 1000

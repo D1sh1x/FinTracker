@@ -1,0 +1,22 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/api/v1/profiles/:p"
+method: PATCH
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: p
+    value: a494a5ed-d787-ac66-08a5-a9985035873e
+    disabled: false
+    description: "(Required) "
+body:
+  type: json
+  content: |-
+    {
+      "name": "string",
+      "timezone": "string"
+    }
+settings: {}
+examples: ./.resources/Update Profile.resources/examples
+order: 4000

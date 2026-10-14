@@ -1,0 +1,26 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/api/v1/profiles/:p/budgets/:month"
+method: PUT
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: p
+    value: a494a5ed-d787-ac66-08a5-a9985035873e
+    disabled: false
+    description: "(Required) "
+  - key: month
+    value: 0576-01
+    disabled: false
+    description: "(Required) "
+body:
+  type: json
+  content: |-
+    {
+      "limit_minor": "9418",
+      "version": 966
+    }
+settings: {}
+examples: ./.resources/Put Budget.resources/examples
+order: 2000

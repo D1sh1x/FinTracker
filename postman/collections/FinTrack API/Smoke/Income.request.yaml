@@ -1,0 +1,23 @@
+{
+  "$kind": "http-request",
+  "order": 4000,
+  "method": "POST",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/transactions",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 201', () => pm.response.to.have.status(201));\n\n"
+    }
+  ],
+  "headers": [
+    {
+      "key": "Content-Type",
+      "value": "application/json"
+    }
+  ],
+  "body": {
+    "type": "json",
+    "content": "{\n  \"id\": \"{{income_id}}\",\n  \"type\": \"income\",\n  \"amount_minor\": \"3000000\",\n  \"category_id\": \"{{income_category}}\",\n  \"occurred_on\": \"{{today}}\",\n  \"note\": \"Зарплата\"\n}"
+  }
+}

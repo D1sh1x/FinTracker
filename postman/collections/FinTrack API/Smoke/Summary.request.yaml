@@ -1,0 +1,13 @@
+{
+  "$kind": "http-request",
+  "order": 10000,
+  "method": "GET",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/summary?month={{month}}",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 200', () => pm.response.to.have.status(200));\n\nconst result = pm.response.json(); pm.test('Exact financial totals', () => { pm.expect(result.balance_minor).to.equal('3874950'); pm.expect(result.expense_minor).to.equal('125050'); pm.expect(result.income_minor).to.equal('3000000'); pm.expect(result.budget.remaining_minor).to.equal('1874950'); });"
+    }
+  ]
+}

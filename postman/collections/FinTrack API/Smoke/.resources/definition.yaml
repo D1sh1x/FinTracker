@@ -1,0 +1,6 @@
+{
+  "$kind": "collection",
+  "name": "Smoke",
+  "description": "Financial lifecycle. Run against a dedicated test database; creates two profiles.",
+  "order": 0
+}

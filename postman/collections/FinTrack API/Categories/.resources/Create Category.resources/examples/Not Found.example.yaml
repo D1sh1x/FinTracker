@@ -1,0 +1,41 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/v1/profiles/:p/categories"
+  method: POST
+  headers:
+    Accept: application/json
+  pathVariables:
+    - key: p
+      value: a494a5ed-d787-ac66-08a5-a9985035873e
+      disabled: false
+      description: "(Required) "
+  body:
+    type: json
+    content: |-
+      {
+        "id": "a580695b-d119-5a16-430f-77ccdd936105",
+        "name": "string",
+        "type": "income",
+        "icon": "heart",
+        "color": "#16925A"
+      }
+response:
+  statusCode: 404
+  statusText: Not Found
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "error": {
+          "code": "string",
+          "message": "string",
+          "request_id": "string",
+          "fields": {
+            "key_0": "string",
+            "key_1": "string"
+          }
+        }
+      }
+order: 3000

@@ -1,0 +1,23 @@
+{
+  "$kind": "http-request",
+  "order": 14000,
+  "method": "PATCH",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/transactions/{{expense_id}}",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 409', () => pm.response.to.have.status(409));\npm.test('Structured error', () => { const e=pm.response.json().error; pm.expect(e.code).to.be.a('string'); pm.expect(e.request_id).to.be.a('string'); });\n"
+    }
+  ],
+  "headers": [
+    {
+      "key": "Content-Type",
+      "value": "application/json"
+    }
+  ],
+  "body": {
+    "type": "json",
+    "content": "{\n  \"amount_minor\": \"100001\",\n  \"version\": 1\n}"
+  }
+}

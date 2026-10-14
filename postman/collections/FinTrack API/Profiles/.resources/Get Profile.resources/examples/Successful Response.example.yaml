@@ -1,0 +1,31 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/v1/profiles/:p"
+  method: GET
+  headers:
+    Accept: application/json
+  pathVariables:
+    - key: p
+      value: a494a5ed-d787-ac66-08a5-a9985035873e
+      disabled: false
+      description: "(Required) "
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "id": "8037bbe9-09cd-54c6-b0db-d040fef92adc",
+        "name": "string",
+        "timezone": "string",
+        "currency": "string",
+        "created_at": "1962-07-17T12:10:15.066Z",
+        "updated_at": "1993-10-14T23:31:48.065Z"
+      }
+order: 1000

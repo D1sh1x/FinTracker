@@ -1,0 +1,48 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/v1/profiles/:p/categories?type=expense&include_archived=false"
+  method: GET
+  headers:
+    Accept: application/json
+  queryParams:
+    type: expense
+    include_archived: "false"
+  pathVariables:
+    - key: p
+      value: a494a5ed-d787-ac66-08a5-a9985035873e
+      disabled: false
+      description: "(Required) "
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "items": [
+          {
+            "id": "6bb4376f-e674-49a2-bd4a-d523eda37f30",
+            "profile_id": "b39ed496-9f31-9d58-26e3-0ce2e2664956",
+            "name": "string",
+            "type": "income",
+            "icon": "string",
+            "color": "string",
+            "is_archived": false
+          },
+          {
+            "id": "50bc3553-e5c7-63f8-0537-02e35d5376ac",
+            "profile_id": "de5ea0ab-1209-b037-c635-8340c420ac9e",
+            "name": "string",
+            "type": "expense",
+            "icon": "string",
+            "color": "string",
+            "is_archived": true
+          }
+        ]
+      }
+order: 1000

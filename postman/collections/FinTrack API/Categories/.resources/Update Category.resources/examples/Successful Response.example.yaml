@@ -1,0 +1,42 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/v1/profiles/:p/categories/:id"
+  method: PATCH
+  headers:
+    Accept: application/json
+  pathVariables:
+    - key: p
+      value: a494a5ed-d787-ac66-08a5-a9985035873e
+      disabled: false
+      description: "(Required) "
+    - key: id
+      value: 22fd1573-9884-8bcf-1ec1-2cad9381e413
+      disabled: false
+      description: "(Required) "
+  body:
+    type: json
+    content: |-
+      {
+        "name": "string",
+        "icon": "sparkles",
+        "color": "#Ccc1d1",
+        "is_archived": false
+      }
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "id": "1aad8cac-d438-988f-0137-c6d75ded8cae",
+        "profile_id": "773bc74b-104a-b176-5b26-b19bc8bf4b87",
+        "name": "string",
+        "type": "expense",
+        "icon": "string",
+        "color": "string",
+        "is_archived": false
+      }
+order: 1000

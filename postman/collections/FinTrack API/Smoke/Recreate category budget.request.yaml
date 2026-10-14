@@ -1,0 +1,23 @@
+{
+  "$kind": "http-request",
+  "order": 21000,
+  "method": "PUT",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/category-budgets/{{month}}/{{expense_category}}",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 201', () => pm.response.to.have.status(201));\n\npm.test('Tombstone version continues',()=>pm.expect(pm.response.json().version).to.equal(3));"
+    }
+  ],
+  "headers": [
+    {
+      "key": "Content-Type",
+      "value": "application/json"
+    }
+  ],
+  "body": {
+    "type": "json",
+    "content": "{\n  \"limit_minor\": \"200000\"\n}"
+  }
+}

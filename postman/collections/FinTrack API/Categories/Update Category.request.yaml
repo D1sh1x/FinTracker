@@ -1,0 +1,28 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/api/v1/profiles/:p/categories/:id"
+method: PATCH
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: p
+    value: a494a5ed-d787-ac66-08a5-a9985035873e
+    disabled: false
+    description: "(Required) "
+  - key: id
+    value: 22fd1573-9884-8bcf-1ec1-2cad9381e413
+    disabled: false
+    description: "(Required) "
+body:
+  type: json
+  content: |-
+    {
+      "name": "string",
+      "icon": "sparkles",
+      "color": "#Ccc1d1",
+      "is_archived": false
+    }
+settings: {}
+examples: ./.resources/Update Category.resources/examples
+order: 3000

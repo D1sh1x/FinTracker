@@ -1,0 +1,91 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/v1/profiles/:p/summary?month=0576-01"
+  method: GET
+  headers:
+    Accept: application/json
+  queryParams:
+    month: 0576-01
+  pathVariables:
+    - key: p
+      value: a494a5ed-d787-ac66-08a5-a9985035873e
+      disabled: false
+      description: "(Required) "
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "month": "string",
+        "balance_minor": "string",
+        "income_minor": "string",
+        "expense_minor": "string",
+        "net_minor": "string",
+        "categories": [
+          {
+            "category_id": "e27a4d6f-2617-aee0-63cc-35cbc632e61b",
+            "name": "string",
+            "icon": "string",
+            "color": "string",
+            "amount_minor": "string"
+          },
+          {
+            "category_id": "610d6e2f-a6b0-a14b-537a-acfa6aac5e43",
+            "name": "string",
+            "icon": "string",
+            "color": "string",
+            "amount_minor": "string"
+          }
+        ],
+        "budget": {
+          "limit_minor": "string",
+          "spent_minor": "string",
+          "remaining_minor": "string",
+          "used_percent": "string",
+          "daily_available_minor": "string",
+          "days_remaining": 2315
+        },
+        "category_budgets": {
+          "month": "string",
+          "items": [
+            {
+              "category_id": "526caa33-6b6b-b696-cf7b-782ab88e5f6e",
+              "name": "string",
+              "icon": "string",
+              "color": "string",
+              "is_archived": true,
+              "limit_minor": "string",
+              "version": 861,
+              "spent_minor": "string",
+              "remaining_minor": "string",
+              "overspent_minor": "string",
+              "used_percent": "string"
+            },
+            {
+              "category_id": "78746816-fdc8-a205-06ed-d23061fab1e3",
+              "name": "string",
+              "icon": "string",
+              "color": "string",
+              "is_archived": false,
+              "limit_minor": "string",
+              "version": 1407,
+              "spent_minor": "string",
+              "remaining_minor": "string",
+              "overspent_minor": "string",
+              "used_percent": "string"
+            }
+          ],
+          "allocated_minor": "string",
+          "overall_limit_minor": "string",
+          "exceeds_overall": false
+        },
+        "currency": "RUB"
+      }
+order: 1000

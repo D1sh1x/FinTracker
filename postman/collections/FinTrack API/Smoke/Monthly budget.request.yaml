@@ -1,0 +1,23 @@
+{
+  "$kind": "http-request",
+  "order": 7000,
+  "method": "PUT",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/budgets/{{month}}",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 201', () => pm.response.to.have.status(201));\n\n"
+    }
+  ],
+  "headers": [
+    {
+      "key": "Content-Type",
+      "value": "application/json"
+    }
+  ],
+  "body": {
+    "type": "json",
+    "content": "{\n  \"limit_minor\": \"2000000\"\n}"
+  }
+}

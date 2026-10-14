@@ -1,0 +1,6 @@
+workflows:
+  syncSpecToCollection:
+    - spec: ../api/openapi.json
+      collection: ../postman/collections/FinTrack API
+      options:
+        folderStrategy: Tags

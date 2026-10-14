@@ -1,0 +1,31 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/v1/profiles/:p/category-budgets/:month/:id?version=3647"
+  method: DELETE
+  queryParams:
+    version: "3647"
+  pathVariables:
+    - key: p
+      value: a494a5ed-d787-ac66-08a5-a9985035873e
+      disabled: false
+      description: "(Required) "
+    - key: month
+      value: 0576-01
+      disabled: false
+      description: "(Required) "
+    - key: id
+      value: 092bd59c-7903-bfe9-6b8d-1b3e90e0d0c9
+      disabled: false
+      description: (Required) UUID расходной категории этого профиля
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 204
+  statusText: No Content
+  headers:
+    Content-Type: text/plain
+  body:
+    type: text
+    content: ""
+order: 1000

@@ -1,0 +1,25 @@
+$kind: http-request
+description: ""
+url: "{{baseUrl}}/api/v1/profiles/:p/categories"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+pathVariables:
+  - key: p
+    value: a494a5ed-d787-ac66-08a5-a9985035873e
+    disabled: false
+    description: "(Required) "
+body:
+  type: json
+  content: |-
+    {
+      "id": "a580695b-d119-5a16-430f-77ccdd936105",
+      "name": "string",
+      "type": "income",
+      "icon": "heart",
+      "color": "#16925A"
+    }
+settings: {}
+examples: ./.resources/Create Category.resources/examples
+order: 2000

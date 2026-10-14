@@ -1,0 +1,13 @@
+{
+  "$kind": "http-request",
+  "order": 9000,
+  "method": "GET",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/category-budgets/{{month}}",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 200', () => pm.response.to.have.status(200));\n\nconst result=pm.response.json(); const item=result.items.find(c=>c.category_id===pm.collectionVariables.get('expense_category')); pm.test('Exact category overspending',()=>{pm.expect(item.spent_minor).to.equal('125050');pm.expect(item.remaining_minor).to.equal('-25050');pm.expect(item.overspent_minor).to.equal('25050');pm.expect(result.allocated_minor).to.equal('100000');});"
+    }
+  ]
+}
