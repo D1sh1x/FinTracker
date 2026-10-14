@@ -146,10 +146,11 @@ func (s *Server) live(w http.ResponseWriter, r *http.Request) error {
 
 func (s *Server) ready(w http.ResponseWriter, r *http.Request) error {
 	var version string
-	if err := s.Pool.QueryRow(r.Context(), "SELECT version FROM schema_migrations ORDER BY version DESC LIMIT 1").Scan(&version); err != nil {
+	var count int
+	if err := s.Pool.QueryRow(r.Context(), "SELECT max(version),count(*) FROM schema_migrations").Scan(&version, &count); err != nil {
 		return &apiError{Status: 503, Code: "schema_not_ready", Message: "Сервис или схема базы данных ещё не готовы"}
 	}
-	if version != store.CurrentVersion {
+	if version != store.CurrentVersion || count != store.MigrationCount {
 		return &apiError{Status: 503, Code: "schema_not_ready", Message: "Схема базы данных требует обновления"}
 	}
 	return writeJSON(w, 200, map[string]string{"status": "ready"})

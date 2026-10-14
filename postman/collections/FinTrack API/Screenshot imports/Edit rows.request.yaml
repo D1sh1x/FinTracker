@@ -1,0 +1,15 @@
+{
+  "$kind": "http-request",
+  "name": "Edit rows",
+  "description": "Save corrected fields with optimistic version",
+  "order": 3000,
+  "method": "PATCH",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/imports/{{import_id}}/rows",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "type": "json",
+    "content": "{\"version\":{{import_version}},\"rows\":{{edited_rows}}}"
+  }
+}

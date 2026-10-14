@@ -1,0 +1,22 @@
+{
+  "$kind": "http-request",
+  "name": "Confirmation replay",
+  "description": "Requires current version and explicit allow_duplicate for rows matching live operations by date/type/amount. Revalidates categories, wallet/date and amounts under the profile lock. Selected rows are committed atomically; unselected rows are skipped and the batch is closed. Same confirmed request returns the original receipt, even after operation edits/deletion. Changed confirmation returns 409. Deleting an imported operation does not allow silent recreation by this import.",
+  "order": 3000,
+  "method": "POST",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/imports/{{import_id}}/confirm",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "type": "json",
+    "content": "{\"version\":{{import_version}},\"rows\":{{confirm_rows}}}"
+  },
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 200',()=>pm.response.to.have.status(200));\n\nconst x=pm.response.json().items; pm.test('Original receipt and exact kopecks',()=>{pm.expect(x).to.have.length(8);pm.expect(x.every(t=>t.source==='screenshot')).to.be.true;pm.expect(x.filter(t=>t.type==='expense').reduce((n,t)=>n+BigInt(t.amount_minor),0n).toString()).to.equal('263157');pm.expect(x.filter(t=>t.type==='income').reduce((n,t)=>n+BigInt(t.amount_minor),0n).toString()).to.equal('60000');});"
+    }
+  ]
+}

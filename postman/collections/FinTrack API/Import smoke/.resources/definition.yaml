@@ -1,0 +1,5 @@
+{
+  "$kind": "collection",
+  "name": "Import smoke",
+  "description": "Run against the confirmed eight-row WB sample in the dedicated test database after check-main-import.mjs. Values come from its ignored local report. Does not create another set of operations."
+}

@@ -1,0 +1,15 @@
+services:
+  qwen:
+    image: ghcr.io/ggml-org/llama.cpp:server-b10884@sha256:9116e6ed0f288247a9daaa610a3a30c061af2b1d6ee8c9acc0d402b65ec87c29
+    command: ["--model", "/models/Qwen_Qwen3-4B-Instruct-2507-Q4_K_M.gguf", "--alias", "qwen3-4b", "--host", "0.0.0.0", "--port", "8080", "--ctx-size", "4096", "--threads", "4", "--threads-batch", "4", "--parallel", "1", "--gpu-layers", "0", "--no-webui", "--log-disable"]
+    volumes: ["./.local/models:/models:ro"]
+    mem_limit: 8g
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 60
+  api:
+    environment:
+      QWEN_URL: http://qwen:8080

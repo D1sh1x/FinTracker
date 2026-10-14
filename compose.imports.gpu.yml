@@ -1,0 +1,5 @@
+services:
+  qwen:
+    image: ghcr.io/ggml-org/llama.cpp:server-cuda-b10884@sha256:5ebb7a55e3d38e5fe185346fcd908033e69c035ad49b33df0066eb7cf4f7b06b
+    gpus: all
+    command: ["--model", "/models/Qwen_Qwen3-4B-Instruct-2507-Q4_K_M.gguf", "--alias", "qwen3-4b", "--host", "0.0.0.0", "--port", "8080", "--ctx-size", "4096", "--threads", "4", "--threads-batch", "4", "--parallel", "1", "--gpu-layers", "99", "--no-webui", "--log-disable"]

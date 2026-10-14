@@ -1,0 +1,15 @@
+{
+  "$kind": "http-request",
+  "name": "Confirmed receipt",
+  "description": "Read draft and possible duplicates",
+  "order": 2000,
+  "method": "GET",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/imports/{{import_id}}",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 200',()=>pm.response.to.have.status(200));\n\nconst x=pm.response.json(); pm.test('Confirmed with eight rows',()=>{pm.expect(x.status).to.equal('confirmed');pm.expect(x.receipt.items).to.have.length(8);pm.expect(x.result.rows).to.have.length(8);});"
+    }
+  ]
+}

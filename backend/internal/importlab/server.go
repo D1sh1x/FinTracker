@@ -26,7 +26,7 @@ type rowsInput struct {
 }
 
 func New(modelURL, mode, spec string) *Server {
-	return &Server{ModelURL: modelURL, Mode: mode, OpenAPIPath: spec, Client: &http.Client{Timeout: 100 * time.Second}, Gate: make(chan struct{}, 1), OCR: Tesseract}
+	return &Server{ModelURL: modelURL, Mode: mode, OpenAPIPath: spec, Client: &http.Client{Timeout: 100 * time.Second, Transport: http.DefaultTransport.(*http.Transport).Clone()}, Gate: make(chan struct{}, 1), OCR: Tesseract}
 }
 
 func (s *Server) Handler() http.Handler {

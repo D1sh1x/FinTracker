@@ -9,6 +9,8 @@ export type Budget = components["schemas"]["BudgetOut"];
 export type CategoryBudgetItem = components["schemas"]["CategoryBudgetItem"];
 export type CategoryBudgets = components["schemas"]["CategoryBudgetsOut"];
 export type Page = components["schemas"]["TransactionsOut"];
+export type ScreenshotImport = components["schemas"]["ScreenshotImport"];
+export type ScreenshotReceipt = components["schemas"]["ScreenshotReceipt"];
 
 export class ApiError extends Error {
   constructor(
@@ -33,7 +35,9 @@ export async function request<T>(
         ? AbortSignal.any([options.signal, AbortSignal.timeout(20_000)])
         : AbortSignal.timeout(20_000),
       headers: {
-        ...(options.body ? { "Content-Type": "application/json" } : {}),
+        ...(options.body && !(options.body instanceof FormData)
+          ? { "Content-Type": "application/json" }
+          : {}),
         ...options.headers,
       },
     });

@@ -1,0 +1,15 @@
+{
+  "$kind": "http-request",
+  "name": "Cancel import",
+  "description": "Cancel processing/draft without financial writes",
+  "order": 5000,
+  "method": "POST",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/imports/{{import_id}}/cancel",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "type": "json",
+    "content": "{\"version\":{{import_version}}}"
+  }
+}

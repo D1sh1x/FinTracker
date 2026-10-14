@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"fintrack/internal/importlab"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -22,9 +23,12 @@ const (
 )
 
 type Server struct {
-	Pool        *pgxpool.Pool
-	Now         func() time.Time
-	OpenAPIPath string
+	Pool          *pgxpool.Pool
+	Now           func() time.Time
+	OpenAPIPath   string
+	ModelURL      string
+	ImportWorker  *ImportWorker
+	ProcessImport func(context.Context, []byte, string, []importlab.Category) (importlab.Result, error)
 }
 
 type Profile struct {
@@ -190,6 +194,12 @@ func (s *Server) NewHandler() http.Handler {
 		"PUT /api/v1/profiles/{p}/category-budgets/{month}/{id}":    s.putCategoryBudget,
 		"DELETE /api/v1/profiles/{p}/category-budgets/{month}/{id}": s.deleteCategoryBudget,
 		"GET /api/v1/profiles/{p}/summary":                          s.summary,
+		"GET /api/v1/profiles/{p}/imports":                          s.listImports,
+		"POST /api/v1/profiles/{p}/imports":                         s.uploadImport,
+		"GET /api/v1/profiles/{p}/imports/{id}":                     s.getImport,
+		"PATCH /api/v1/profiles/{p}/imports/{id}/rows":              s.editImport,
+		"POST /api/v1/profiles/{p}/imports/{id}/confirm":            s.confirmImport,
+		"POST /api/v1/profiles/{p}/imports/{id}/cancel":             s.cancelImport,
 		"GET /api/v1/profiles/{p}/exports/transactions.csv":         s.exportCSV,
 		"GET /health/live":                                          s.live,
 		"GET /health/ready":                                         s.ready,

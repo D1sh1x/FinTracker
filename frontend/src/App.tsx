@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { CategoryBudgetsPanel } from "./CategoryBudgets";
+import { ImportScreenshots } from "./ImportScreenshots";
 import type { FormEvent } from "react";
 import {
   useInfiniteQuery,
@@ -27,6 +28,7 @@ import {
   ChartColumnIncreasing,
   Search,
   SlidersHorizontal,
+  ImagePlus,
 } from "lucide-react";
 import {
   ApiError,
@@ -67,12 +69,18 @@ import {
 
 type Theme = "light" | "dark" | "system";
 type Section =
-  "overview" | "transactions" | "budget" | "categories" | "settings";
+  | "overview"
+  | "transactions"
+  | "budget"
+  | "categories"
+  | "settings"
+  | "imports";
 const navigation = [
   { id: "overview", label: "Обзор", icon: LayoutDashboard },
   { id: "transactions", label: "Операции", icon: ArrowLeftRight },
   { id: "budget", label: "Бюджет", icon: PieChart },
   { id: "categories", label: "Категории", icon: Layers3 },
+  { id: "imports", label: "Из скриншота", icon: ImagePlus },
   { id: "settings", label: "Настройки", icon: Settings2 },
 ] as const;
 
@@ -366,6 +374,7 @@ function Workspace({
     budget: "Месячный бюджет",
     categories: "Ваши категории",
     settings: "Настройки",
+    imports: "Импорт из скриншота",
   }[section];
   const editedCategoryBudget = summary.data?.category_budgets.items.find(
     (item) => item.category_id === categoryBudgetEditor,
@@ -376,6 +385,7 @@ function Workspace({
     budget: "Небольшой план для больших спокойных дней.",
     categories: "Учёт, который подходит именно вам.",
     settings: "Ваше пространство, ваши правила.",
+    imports: "Сначала проверка, затем запись в учёт.",
   }[section];
   const sharedError = summary.error ?? categories.error ?? wallet.error;
   return (
@@ -511,6 +521,14 @@ function Workspace({
             <Loading />
           ) : (
             <>
+              {section === "imports" && (
+                <ImportScreenshots
+                  person={person}
+                  wallet={wallet.data}
+                  categories={categories.data.items}
+                  onComplete={updated}
+                />
+              )}
               {section === "overview" && (
                 <>
                   {wallet.data.opening_balance_minor === "0" &&

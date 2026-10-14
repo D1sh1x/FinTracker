@@ -261,6 +261,98 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/profiles/{p}/imports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Latest 20 imports for the profile */
+        get: operations["list_screenshot_imports"];
+        put?: never;
+        /**
+         * Queue a PNG/JPEG screenshot
+         * @description Requires confirmed capture_date. Up to 10 MiB and 20 megapixels. Exact file SHA-256 is deduplicated per profile. Existing ready/confirmed batch is returned; failed/cancelled batch can be retried. Creates only a persistent draft, never financial operations. RUB is fixed. Original bytes are deleted after processing, failure, cancellation or confirmation; queued bytes can appear in database backups.
+         */
+        post: operations["upload_screenshot"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/profiles/{p}/imports/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read draft and possible duplicates */
+        get: operations["get_screenshot_import"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/profiles/{p}/imports/{id}/rows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Save corrected fields with optimistic version */
+        patch: operations["edit_screenshot_rows"];
+        trace?: never;
+    };
+    "/api/v1/profiles/{p}/imports/{id}/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Atomically confirm selected rows
+         * @description Requires current version and explicit allow_duplicate for rows matching live operations by date/type/amount. Revalidates categories, wallet/date and amounts under the profile lock. Selected rows are committed atomically; unselected rows are skipped and the batch is closed. Same confirmed request returns the original receipt, even after operation edits/deletion. Changed confirmation returns 409. Deleting an imported operation does not allow silent recreation by this import.
+         */
+        post: operations["confirm_screenshot_import"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/profiles/{p}/imports/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel processing/draft without financial writes */
+        post: operations["cancel_screenshot_import"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -559,9 +651,9 @@ export interface components {
             note: string;
             /**
              * Source
-             * @constant
+             * @enum {string}
              */
-            source: "manual";
+            source: "manual" | "screenshot";
             /** Version */
             version: number;
             /**
@@ -687,6 +779,99 @@ export interface components {
             allocated_minor: string;
             overall_limit_minor: string | null;
             exceeds_overall: boolean;
+        };
+        ScreenshotRow: {
+            id: string;
+            description: string;
+            /** @enum {string} */
+            type: "income" | "expense" | "unknown";
+            amount_minor: string | null;
+            date: string | null;
+            source: string;
+            /** @description Active category UUID of this profile, or empty until direction/category is chosen. */
+            category_id: string;
+            category_name: string;
+            reason: string;
+            issues: string[];
+            /** @description Отдельная банковская подпись для категоризации; не входит в название операции. */
+            bank_category?: string;
+        };
+        ScreenshotResult: {
+            model: string;
+            ocr: string;
+            /** @description Исходный полный проход OCR; суммы извлекаются из него. Уточнённые названия находятся в rows.description и опциональных lines.name. */
+            text: string;
+            rows: components["schemas"]["ScreenshotRow"][];
+            warnings: string[];
+            lines: {
+                text: string;
+                confidence: number;
+                /** @description Повторный OCR только области названия; не заменяет сумму или знак. */
+                name?: string;
+                name_confidence?: number;
+                box: number[];
+            }[];
+            metrics: {
+                ocr_ms: number;
+                model_ms: number;
+                total_ms: number;
+                prompt_tokens: number;
+                generated_tokens: number;
+                tokens_per_second: number;
+            };
+        };
+        ScreenshotReceipt: {
+            items: components["schemas"]["TransactionOut"][];
+        };
+        ScreenshotImport: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            profile_id: string;
+            /** Format: date */
+            capture_date: string;
+            /** @enum {string} */
+            status: "queued" | "processing" | "ready" | "failed" | "confirmed" | "cancelled";
+            version: number;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: date-time */
+            updated_at: string;
+            result: components["schemas"]["ScreenshotResult"];
+            /** @description Possible matches by date/type/amount; not automatic duplicates. */
+            duplicates: {
+                [key: string]: components["schemas"]["TransactionOut"][];
+            };
+            error: string;
+            receipt: components["schemas"]["ScreenshotReceipt"] | null;
+        };
+        ScreenshotImports: {
+            items: components["schemas"]["ScreenshotImport"][];
+        };
+        ScreenshotEditRow: {
+            /** Format: uuid */
+            id: string;
+            description: string;
+            /** @enum {string} */
+            type: "income" | "expense" | "unknown";
+            amount_minor: string | null;
+            date: string | null;
+            category_id: string;
+        };
+        ScreenshotEdit: {
+            version: number;
+            rows: components["schemas"]["ScreenshotEditRow"][];
+        };
+        ScreenshotConfirm: {
+            version: number;
+            rows: {
+                /** Format: uuid */
+                id: string;
+                allow_duplicate: boolean;
+            }[];
+        };
+        ScreenshotVersion: {
+            version: number;
         };
     };
     responses: never;
@@ -2797,6 +2982,496 @@ export interface operations {
                 };
             };
             /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+        };
+    };
+    list_screenshot_imports: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                p: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScreenshotImports"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Version, state or duplicate conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Deleted resource */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Database unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+        };
+    };
+    upload_screenshot: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                p: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": {
+                    /** Format: binary */
+                    image: string;
+                    /** Format: date */
+                    capture_date: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScreenshotImport"];
+                };
+            };
+            /** @description Queued */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScreenshotImport"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Version, state or duplicate conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Deleted resource */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Database unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+        };
+    };
+    get_screenshot_import: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                p: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScreenshotImport"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Version, state or duplicate conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Deleted resource */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Database unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+        };
+    };
+    edit_screenshot_rows: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                p: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScreenshotEdit"];
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScreenshotImport"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Version, state or duplicate conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Deleted resource */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Database unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+        };
+    };
+    confirm_screenshot_import: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                p: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScreenshotConfirm"];
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScreenshotReceipt"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Version, state or duplicate conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Deleted resource */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Database unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+        };
+    };
+    cancel_screenshot_import: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                p: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScreenshotVersion"];
+            };
+        };
+        responses: {
+            /** @description Successful response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScreenshotImport"];
+                };
+            };
+            /** @description Invalid request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Version, state or duplicate conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Deleted resource */
+            410: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Validation error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Database unavailable */
             503: {
                 headers: {
                     [name: string]: unknown;

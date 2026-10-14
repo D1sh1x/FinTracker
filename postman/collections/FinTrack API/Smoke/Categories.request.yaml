@@ -7,7 +7,7 @@
     {
       "type": "afterResponse",
       "language": "text/javascript",
-      "code": "pm.test('HTTP 200', () => pm.response.to.have.status(200));\n\nconst categories = pm.response.json().items; pm.collectionVariables.set('expense_category', categories.find(c => c.name === 'Продукты').id); pm.collectionVariables.set('income_category', categories.find(c => c.name === 'Зарплата').id); pm.test('11 initial categories', () => pm.expect(categories).to.have.length(11));"
+      "code": "pm.test('HTTP 200', () => pm.response.to.have.status(200));\n\nconst categories = pm.response.json().items; pm.collectionVariables.set('expense_category', categories.find(c => c.name === 'Продукты').id); pm.collectionVariables.set('income_category', categories.find(c => c.name === 'Зарплата').id); pm.test('13 initial categories', () => pm.expect(categories).to.have.length(13));"
     }
   ]
 }

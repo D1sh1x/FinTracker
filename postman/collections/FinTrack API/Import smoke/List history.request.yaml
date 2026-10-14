@@ -1,0 +1,15 @@
+{
+  "$kind": "http-request",
+  "name": "List history",
+  "description": "Latest 20 imports for the profile",
+  "order": 1000,
+  "method": "GET",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/imports",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 200',()=>pm.response.to.have.status(200));\n\npm.test('Batch in history',()=>pm.expect(pm.response.json().items.some(x=>x.id===pm.variables.get('import_id'))).to.be.true);"
+    }
+  ]
+}

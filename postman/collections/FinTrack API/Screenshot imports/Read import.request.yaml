@@ -1,0 +1,8 @@
+{
+  "$kind": "http-request",
+  "name": "Read import",
+  "description": "Read draft and possible duplicates",
+  "order": 2000,
+  "method": "GET",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/imports/{{import_id}}"
+}

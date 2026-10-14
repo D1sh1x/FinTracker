@@ -244,11 +244,11 @@ README.md             запуск, обновление и восстановл
 | Profile | `id`, `name`, `timezone`, `currency=RUB`, `created_at`, `updated_at` |
 | Wallet | `id`, `profile_id` UNIQUE, `name`, `opening_balance_minor`, `tracking_start_date`, `version`, технические времена |
 | Category | `id`, `profile_id`, `type=income/expense`, `name`, нормализованное имя, `icon`, `color`, `is_archived`, технические времена |
-| Transaction | `id`, `profile_id`, `wallet_id`, `category_id`, `type`, `amount_minor`, `occurred_on`, `note`, `source=manual`, `version`, `deleted_at`, технические времена |
+| Transaction | `id`, `profile_id`, `wallet_id`, `category_id`, `type`, `amount_minor`, `occurred_on`, `note`, `source=manual/screenshot`, `version`, `deleted_at`, технические времена |
 | MonthlyBudget | `id`, `profile_id`, `month` (первый день месяца), `limit_minor`, `version`, `deleted_at`, технические времена; UNIQUE `(profile_id, month)` |
 | CategoryBudget | `id`, `profile_id`, `category_id`, `category_type=expense`, `month`, `limit_minor`, `version`, `deleted_at`, технические времена; UNIQUE `(profile_id, month, category_id)`; составной FK к расходной категории своего профиля |
 
-`source` в MVP допускает только `manual`; новые значения появляются с соответствующей миграцией и версией контракта. Сырые банковские сообщения и файлы не хранятся в таблице операций.
+`source` допускает `manual` и, после миграции `0004`, `screenshot`. Сырые банковские сообщения и файлы не хранятся в таблице операций. Очередь, редактирование, подтверждение и хранение скриншотов описаны в [docs/SCREENSHOT_IMPORT.md](docs/SCREENSHOT_IMPORT.md); контракт обновлён в `api/openapi.json`.
 
 Обязательные ограничения:
 

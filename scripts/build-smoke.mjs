@@ -9,7 +9,7 @@ const profile = '/api/v1/profiles/{p}'
 const expense = { id: '{{expense_id}}', type: 'expense', amount_minor: '125050', category_id: '{{expense_category}}', occurred_on: '{{today}}', note: 'Продукты на неделю' }
 const cases = [
   ['Create profile', 'POST', '/api/v1/profiles', 201, { id: '{{profile_id}}', name: 'Проверка API' }],
-  ['Categories', 'GET', profile + '/categories', 200, undefined, `const categories = pm.response.json().items; pm.collectionVariables.set('expense_category', categories.find(c => c.name === 'Продукты').id); pm.collectionVariables.set('income_category', categories.find(c => c.name === 'Зарплата').id); pm.test('11 initial categories', () => pm.expect(categories).to.have.length(11));`],
+  ['Categories', 'GET', profile + '/categories', 200, undefined, `const categories = pm.response.json().items; pm.collectionVariables.set('expense_category', categories.find(c => c.name === 'Продукты').id); pm.collectionVariables.set('income_category', categories.find(c => c.name === 'Зарплата').id); pm.test('13 initial categories', () => pm.expect(categories).to.have.length(13));`],
   ['Opening balance', 'PATCH', profile + '/wallet', 200, { opening_balance_minor: '1000000', version: 1 }],
   ['Income', 'POST', profile + '/transactions', 201, { id: '{{income_id}}', type: 'income', amount_minor: '3000000', category_id: '{{income_category}}', occurred_on: '{{today}}', note: 'Зарплата' }],
   ['Expense', 'POST', profile + '/transactions', 201, expense],

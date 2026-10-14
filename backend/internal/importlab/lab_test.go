@@ -143,7 +143,7 @@ func TestBankSubscriptionWithoutMatchingCategoryDoesNotCallModel(t *testing.T) {
 	s := New("http://127.0.0.1:1", "cpu", "")
 	rows := []Row{{Description: "Digital Goods · Цифровые подписки", Type: "expense"}}
 	metrics, warnings := s.classify(context.Background(), rows)
-	if len(warnings) != 0 || metrics.GeneratedTokens != 0 || rows[0].CategoryID != UnknownCategory || !strings.Contains(rows[0].Reason, "нет точной категории") {
+	if len(warnings) != 0 || metrics.GeneratedTokens != 0 || rows[0].CategoryID != UnknownCategory || !strings.Contains(rows[0].Reason, "вручную") {
 		t.Fatal(rows, metrics, warnings)
 	}
 }
@@ -251,6 +251,29 @@ func TestKnownCategoryWithoutReasonHasCorrectLabel(t *testing.T) {
 	_, warnings := s.classify(context.Background(), rows)
 	if len(warnings) > 0 || rows[0].CategoryID != "cafe" || rows[0].Reason != "Категория предложена Qwen" {
 		t.Fatal(rows, warnings)
+	}
+}
+
+func TestProfileCatalogUsesUUIDAndPreservesMoney(t *testing.T) {
+	const id = "a5b80719-0405-4b7d-8e3a-32e3e7ef5cb1"
+	amount, date := "18758", "2026-10-14"
+	for _, kind := range []string{"expense", "income"} {
+		t.Run(kind, func(t *testing.T) {
+			s := modelFixture(t, `{"rows":[{"index":0,"category_id":"`+id+`","reason":"Продукты"}]}`, "stop")
+			s.Categories = []Category{{ID: UnknownCategory, Name: "Не определено", Type: "unknown"}, {ID: id, Name: "Продукты", Type: "expense"}}
+			rows := []Row{{Description: "Магнит", Type: kind, Amount: &amount, Date: &date}}
+			_, warnings := s.classify(context.Background(), rows)
+			if len(warnings) != 0 || *rows[0].Amount != "18758" || *rows[0].Date != "2026-10-14" {
+				t.Fatal(rows, warnings)
+			}
+			want := UnknownCategory
+			if kind == "expense" {
+				want = id
+			}
+			if rows[0].CategoryID != want {
+				t.Fatal(rows)
+			}
+		})
 	}
 }
 

@@ -24,6 +24,8 @@ var initialCategories = []categoryInput{
 	{Type: "income", Name: "Зарплата", Icon: "briefcase", Color: "#69805D"},
 	{Type: "income", Name: "Подработка", Icon: "wallet", Color: "#7398AE"},
 	{Type: "income", Name: "Другой доход", Icon: "gift", Color: "#9690AF"},
+	{Type: "income", Name: "Не определено", Icon: "circle", Color: "#9690AF"},
+	{Type: "expense", Name: "Не определено", Icon: "circle", Color: "#9690AF"},
 }
 
 func (s *Server) listProfiles(w http.ResponseWriter, r *http.Request) error {

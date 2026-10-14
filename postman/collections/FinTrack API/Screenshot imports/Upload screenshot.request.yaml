@@ -1,0 +1,28 @@
+{
+  "$kind": "http-request",
+  "name": "Upload screenshot",
+  "description": "Requires confirmed capture_date. Up to 10 MiB and 20 megapixels. Exact file SHA-256 is deduplicated per profile. Existing ready/confirmed batch is returned; failed/cancelled batch can be retried. Creates only a persistent draft, never financial operations. RUB is fixed. Original bytes are deleted after processing, failure, cancellation or confirmation; queued bytes can appear in database backups.",
+  "order": 6000,
+  "method": "POST",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/imports",
+  "headers": {
+    "Accept": "application/json"
+  },
+  "body": {
+    "type": "formdata",
+    "content": [
+      {
+        "type": "file",
+        "key": "image",
+        "src": "",
+        "description": "Choose a local PNG/JPEG, up to 10 MiB and 20 MP"
+      },
+      {
+        "type": "text",
+        "key": "capture_date",
+        "value": "{{capture_date}}",
+        "description": "Required YYYY-MM-DD: actual screenshot capture day"
+      }
+    ]
+  }
+}

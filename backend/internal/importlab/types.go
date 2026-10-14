@@ -71,4 +71,5 @@ type Server struct {
 	OpenAPIPath string
 	Mode        string
 	OCR         OCRFunc
+	Categories  []Category
 }

@@ -9,7 +9,10 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-const CurrentVersion = "0003"
+const (
+	CurrentVersion = "0004"
+	MigrationCount = 4
+)
 
 //go:embed 0001.sql
 var initialSchema string
@@ -19,6 +22,9 @@ var budgetDeletionSchema string
 
 //go:embed 0003.sql
 var categoryBudgetSchema string
+
+//go:embed 0004.sql
+var screenshotSchema string
 
 type migration struct{ version, sql string }
 
@@ -59,7 +65,7 @@ func Migrate(ctx context.Context, pool *pgxpool.Pool) error {
 	if _, err = tx.Exec(ctx, "CREATE TABLE IF NOT EXISTS schema_migrations (version TEXT PRIMARY KEY, applied_at TIMESTAMPTZ NOT NULL DEFAULT now())"); err != nil {
 		return err
 	}
-	for _, step := range []migration{{"0001", initialSchema}, {"0002", budgetDeletionSchema}, {"0003", categoryBudgetSchema}} {
+	for _, step := range []migration{{"0001", initialSchema}, {"0002", budgetDeletionSchema}, {"0003", categoryBudgetSchema}, {"0004", screenshotSchema}} {
 		var applied bool
 		if err = tx.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM schema_migrations WHERE version=$1)", step.version).Scan(&applied); err != nil {
 			return err

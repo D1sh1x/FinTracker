@@ -214,7 +214,7 @@ func TestConcurrentProfileCreation(t *testing.T) {
 		t.Fatal(statuses)
 	}
 	categories := object(t, app.call("GET", "/api/v1/profiles/"+body["id"].(string)+"/categories", nil), 200)["items"].([]any)
-	if len(categories) != 11 {
+	if len(categories) != 13 {
 		t.Fatal(categories)
 	}
 }

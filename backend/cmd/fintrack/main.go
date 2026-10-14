@@ -51,6 +51,15 @@ func run() error {
 		contract = "../api/openapi.json"
 	}
 	api := &httpapi.Server{Pool: pool, Now: time.Now, OpenAPIPath: contract}
+	api.ModelURL = os.Getenv("QWEN_URL")
+	if api.ModelURL == "" {
+		api.ModelURL = "http://127.0.0.1:8091"
+	}
+	api.ImportWorker = &httpapi.ImportWorker{}
+	workerContext, stopWorker := context.WithCancel(ctx)
+	workerDone := make(chan struct{})
+	go func() { defer close(workerDone); api.RunImports(workerContext) }()
+	defer func() { stopWorker(); <-workerDone }()
 	server := &http.Server{Addr: address, Handler: api.NewHandler(), ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 20 * time.Second, WriteTimeout: 60 * time.Second, IdleTimeout: 90 * time.Second}
 	serveErrors := make(chan error, 1)
 	go func() { serveErrors <- server.ListenAndServe() }()

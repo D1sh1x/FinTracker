@@ -1,0 +1,5 @@
+{
+  "$kind": "collection",
+  "name": "Screenshot imports",
+  "description": "Six operations from api/openapi.json. Set profile_id/import_id/current version. Upload and confirmation create drafts/financial records; use a dedicated test database for experiments."
+}
