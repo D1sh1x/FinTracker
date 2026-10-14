@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>ФинТрек · Тест скриншотов</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <div class="shell">
+      <header>
+        <div>
+          <a href="http://localhost:8088" class="brand"
+            >ФинТрек<span>· лаборатория</span></a
+          >
+          <h1>Проверим банковский скриншот</h1>
+          <p>Распознавание, категории и скорость на твоём компьютере.</p>
+        </div>
+        <button id="theme" class="secondary" type="button" aria-pressed="false">
+          Тёмная тема
+        </button>
+      </header>
+      <div class="status">
+        <span id="ready-dot" class="dot"></span
+        ><span id="status" role="status">Проверяем Qwen…</span
+        ><span class="model">Qwen3-4B · Q4_K_M</span><span id="mode"></span>
+      </div>
+      <div class="layout">
+        <aside class="panel">
+          <h2>Исходные данные</h2>
+          <p class="muted">
+            Локальный тест. Результаты остаются в предпросмотре и не создают
+            финансовых операций.
+          </p>
+          <label class="upload" for="image"
+            ><strong>Выбрать скриншот</strong
+            ><span>PNG или JPEG · до 10 МБ / 20 Мп</span
+            ><input type="file" id="image" accept="image/png,image/jpeg"
+          /></label>
+          <p class="hint">Или скопируй изображение и нажми Ctrl+V на этой странице.</p>
+          <p id="file-name" class="muted" role="status"></p>
+          <img id="preview" alt="Выбранный банковский скриншот" hidden />
+          <label
+            >Дата съёмки скриншота<input id="captured" type="date"
+          /></label>
+          <p class="hint">
+            Нужна для «Сегодня», «Вчера» и дат без года. Для старого снимка
+            укажи его дату съёмки.
+          </p>
+          <button id="analyze" class="primary" type="button">
+            Распознать и классифицировать
+          </button>
+          <details id="text-details" open>
+            <summary>Текст операций / результат OCR</summary>
+            <label class="sr-only" for="text">Текст операций</label
+            ><textarea
+              id="text"
+              rows="10"
+              placeholder="14.10.2026&#10;Пятёрочка −1 250,50 ₽&#10;Wildberries −2 400 ₽&#10;Зарплата ООО Пример +45 000 ₽"
+            ></textarea>
+            <div class="actions">
+              <button id="sample" class="secondary" type="button">
+                Контрольный пример</button
+              ><button id="text-test" class="secondary" type="button">
+                Проверить текст
+              </button>
+            </div>
+          </details>
+        </aside>
+        <main>
+          <section class="panel metrics-panel" aria-label="Измерения">
+            <div><span>Весь тест</span><strong id="total-time">—</strong></div>
+            <div><span>OCR</span><strong id="ocr-time">—</strong></div>
+            <div><span>Qwen</span><strong id="model-time">—</strong></div>
+            <div><span>Генерация</span><strong id="speed">—</strong></div>
+          </section>
+          <div id="error" role="alert" hidden></div>
+          <div id="warnings" role="status"></div>
+          <section class="panel result-panel">
+            <div class="result-heading">
+              <div>
+                <h2>Распознанные операции</h2>
+                <p id="count" class="muted">
+                  Загрузи скриншот или проверь контрольный текст.
+                </p>
+              </div>
+              <button id="cancel" class="secondary" type="button" hidden>
+                Отменить тест
+              </button>
+            </div>
+            <div id="empty" class="empty">
+              У каждой строки появятся сумма, направление, категория и
+              пояснение. При недостатке данных — «Не определено».
+            </div>
+            <div id="rows"></div>
+            <div id="result-actions" class="actions">
+              <button id="reclassify" class="primary" type="button">
+                Переклассифицировать после правок</button
+              ><button id="add-row" class="secondary" type="button">
+                Добавить строку</button
+              ><button id="download" class="secondary" type="button" disabled>
+                Скачать результат JSON
+              </button>
+            </div>
+          </section>
+          <p class="footnote">
+            Суммы, даты и знаки сверяй со скриншотом. Название маркетплейса без
+            товара и перевод без назначения могут остаться неопределёнными.
+            Оценка OCR и категория модели не гарантируют правильность финансовых
+            полей.
+          </p>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>

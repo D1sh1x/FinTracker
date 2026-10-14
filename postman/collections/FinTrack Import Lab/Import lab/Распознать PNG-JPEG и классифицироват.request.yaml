@@ -1,0 +1,22 @@
+$kind: http-request
+name: Распознать PNG/JPEG и классифицировать строки
+description: "Локальная лаборатория: не создаёт операций в финансовой базе. Категория unknown означает «Не определено». При недоступной/ошибающейся модели возвращает результат с warnings и unknown вместо выдуманной категории. Суммы — строки целых положительных копеек или null; направление хранится отдельно."
+url: "{{baseUrl}}/api/lab/analyze"
+method: POST
+headers:
+  Content-Type: multipart/form-data
+  Accept: application/json
+body:
+  type: formdata
+  content:
+    - type: file
+      key: image
+      src: ""
+      description: (Required) PNG/JPEG, до 10 МБ и 20 млн пикселей
+    - type: text
+      key: capture_date
+      value: string
+      description: Дата съёмки YYYY-MM-DD для относительных дат и пропущенного года
+settings: {}
+examples: ./.resources/Распознать PNG-JPEG и классифицироват.resources/examples
+order: 2000

@@ -1,0 +1,23 @@
+{
+  "$kind": "http-request",
+  "order": 3000,
+  "method": "POST",
+  "url": "{{baseUrl}}/api/lab/text",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 200',()=>pm.response.to.have.status(200));\nconst r=pm.response.json();pm.test('Missing facts are not invented',()=>{pm.expect(r.rows[0].type).to.equal('unknown');pm.expect(r.rows[0].date).to.equal(null);pm.expect(r.rows[0].category_name).to.equal('Не определено');pm.expect(r.metrics.generated_tokens).to.equal(0);});"
+    }
+  ],
+  "headers": [
+    {
+      "key": "Content-Type",
+      "value": "application/json"
+    }
+  ],
+  "body": {
+    "type": "json",
+    "content": "{\n  \"text\": \"Магазин 500 ₽\"\n}"
+  }
+}

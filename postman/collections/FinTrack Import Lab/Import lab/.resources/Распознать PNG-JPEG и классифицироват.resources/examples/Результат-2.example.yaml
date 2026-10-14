@@ -1,0 +1,33 @@
+$kind: http-example
+name: Результат
+request:
+  url: "{{baseUrl}}/api/lab/analyze"
+  method: POST
+  headers:
+    Accept: application/json
+  body:
+    type: formdata
+    content:
+      - type: file
+        key: image
+        src: ""
+        description: (Required) PNG/JPEG, до 10 МБ и 20 млн пикселей
+      - type: text
+        key: capture_date
+        value: string
+        description: Дата съёмки YYYY-MM-DD для относительных дат и пропущенного года
+response:
+  statusCode: 422
+  statusText: Unprocessable Entity (WebDAV) (RFC 4918)
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "error": {
+          "code": "string",
+          "message": "string"
+        }
+      }
+order: 3000

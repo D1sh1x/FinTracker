@@ -1,0 +1,44 @@
+$kind: http-example
+name: Результат
+request:
+  url: "{{baseUrl}}/api/lab/classify"
+  method: POST
+  headers:
+    Accept: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "rows": [
+          {
+            "id": "string",
+            "description": "string",
+            "type": "unknown",
+            "amount_minor": "string",
+            "date": "string",
+            "source": "string",
+            "category_id": "string",
+            "category_name": "string",
+            "reason": "string",
+            "issues": [
+              "string",
+              "string"
+            ]
+          }
+        ]
+      }
+response:
+  statusCode: 429
+  statusText: Too Many Requests
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "error": {
+          "code": "string",
+          "message": "string"
+        }
+      }
+order: 4000

@@ -1,0 +1,29 @@
+$kind: http-example
+name: Результат
+request:
+  url: "{{baseUrl}}/api/lab/text"
+  method: POST
+  headers:
+    Accept: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "text": "string",
+        "capture_date": "string"
+      }
+response:
+  statusCode: 422
+  statusText: Unprocessable Entity (WebDAV) (RFC 4918)
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "error": {
+          "code": "string",
+          "message": "string"
+        }
+      }
+order: 3000

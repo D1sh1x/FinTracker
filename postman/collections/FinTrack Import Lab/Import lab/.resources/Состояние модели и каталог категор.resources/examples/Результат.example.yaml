@@ -1,0 +1,37 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/lab/status"
+  method: GET
+  headers:
+    Accept: application/json
+  body:
+    type: text
+    content: ""
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "ready": false,
+        "model": "string",
+        "mode": "string",
+        "ocr": "string",
+        "message": "string",
+        "categories": [
+          {
+            "id": "string",
+            "name": "string",
+            "type": "string"
+          },
+          {
+            "id": "string",
+            "name": "string",
+            "type": "string"
+          }
+        ]
+      }
+order: 1000

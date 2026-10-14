@@ -1,0 +1,108 @@
+$kind: http-example
+request:
+  url: "{{baseUrl}}/api/lab/classify"
+  method: POST
+  headers:
+    Accept: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "rows": [
+          {
+            "id": "string",
+            "description": "string",
+            "type": "unknown",
+            "amount_minor": "string",
+            "date": "string",
+            "source": "string",
+            "category_id": "string",
+            "category_name": "string",
+            "reason": "string",
+            "issues": [
+              "string",
+              "string"
+            ]
+          }
+        ]
+      }
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    Content-Type: application/json
+  body:
+    type: json
+    content: |-
+      {
+        "model": "string",
+        "ocr": "string",
+        "text": "string",
+        "lines": [
+          {
+            "text": "string",
+            "confidence": 901.2664621695876,
+            "box": [
+              3820,
+              8075,
+              2009,
+              9806
+            ]
+          },
+          {
+            "text": "string",
+            "confidence": 6390.617466531694,
+            "box": [
+              1395,
+              5703,
+              5772,
+              7294
+            ]
+          }
+        ],
+        "rows": [
+          {
+            "id": "string",
+            "description": "string",
+            "type": "income",
+            "amount_minor": "string",
+            "date": "string",
+            "source": "string",
+            "category_id": "string",
+            "category_name": "string",
+            "reason": "string",
+            "issues": [
+              "string",
+              "string"
+            ]
+          },
+          {
+            "id": "string",
+            "description": "string",
+            "type": "unknown",
+            "amount_minor": "string",
+            "date": "string",
+            "source": "string",
+            "category_id": "string",
+            "category_name": "string",
+            "reason": "string",
+            "issues": [
+              "string",
+              "string"
+            ]
+          }
+        ],
+        "warnings": [
+          "string",
+          "string"
+        ],
+        "metrics": {
+          "ocr_ms": 5400,
+          "model_ms": 1660,
+          "total_ms": 1252,
+          "prompt_tokens": 5745,
+          "generated_tokens": 4607,
+          "tokens_per_second": 5836.522332392633
+        }
+      }
+order: 1000

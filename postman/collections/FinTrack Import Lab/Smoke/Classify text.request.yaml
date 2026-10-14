@@ -1,0 +1,23 @@
+{
+  "$kind": "http-request",
+  "order": 2000,
+  "method": "POST",
+  "url": "{{baseUrl}}/api/lab/text",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 200',()=>pm.response.to.have.status(200));\nconst r=pm.response.json();pm.test('Real generation and exact sums',()=>{pm.expect(r.warnings).to.have.length(0);pm.expect(r.rows).to.have.length(2);pm.expect(r.metrics.generated_tokens).to.be.above(0);pm.expect(r.rows[0].amount_minor).to.equal('125050');pm.expect(r.rows[0].category_id).to.equal('products');pm.expect(r.rows[1].category_name).to.equal('Не определено');});"
+    }
+  ],
+  "headers": [
+    {
+      "key": "Content-Type",
+      "value": "application/json"
+    }
+  ],
+  "body": {
+    "type": "json",
+    "content": "{\n  \"text\": \"14.10.2026\\nПятёрочка продукты −1 250,50 ₽\\nWildberries −2 400 ₽\",\n  \"capture_date\": \"2026-10-14\"\n}"
+  }
+}

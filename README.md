@@ -4,6 +4,8 @@
 
 Технические требования: [REQUIREMENTS.md](REQUIREMENTS.md). Проверки и ограничения: [VERIFICATION.md](VERIFICATION.md).
 
+Локальная лаборатория скриншотов и Qwen3-4B: http://localhost:8090. Можно выбрать PNG/JPEG или вставить скриншот через Ctrl+V. Запуск и измерения CPU/GPU описаны в [docs/LOCAL_IMPORT_TEST.md](docs/LOCAL_IMPORT_TEST.md). Она показывает предпросмотр и категории, включая «Не определено»; финансовые операции при тесте не создаются.
+
 ## Быстрый запуск в Docker
 
 Нужны Docker с запущенным движком и Docker Compose. Node.js и Go на сервере не требуются: сборка выполняется внутри контейнеров. Образы зафиксированы по digest, зависимости — в go.sum и package-lock.json.

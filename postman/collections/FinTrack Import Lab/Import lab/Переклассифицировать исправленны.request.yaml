@@ -1,0 +1,33 @@
+$kind: http-request
+name: Переклассифицировать исправленные описания
+description: "Локальная лаборатория: не создаёт операций в финансовой базе. Категория unknown означает «Не определено». При недоступной/ошибающейся модели возвращает результат с warnings и unknown вместо выдуманной категории. Суммы — строки целых положительных копеек или null; направление хранится отдельно."
+url: "{{baseUrl}}/api/lab/classify"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "rows": [
+        {
+          "id": "string",
+          "description": "string",
+          "type": "unknown",
+          "amount_minor": "string",
+          "date": "string",
+          "source": "string",
+          "category_id": "string",
+          "category_name": "string",
+          "reason": "string",
+          "issues": [
+            "string",
+            "string"
+          ]
+        }
+      ]
+    }
+settings: {}
+examples: ./.resources/Переклассифицировать исправленны.resources/examples
+order: 4000

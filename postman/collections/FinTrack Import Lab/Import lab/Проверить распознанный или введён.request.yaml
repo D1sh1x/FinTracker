@@ -1,0 +1,18 @@
+$kind: http-request
+name: Проверить распознанный или введённый текст
+description: "Локальная лаборатория: не создаёт операций в финансовой базе. Категория unknown означает «Не определено». При недоступной/ошибающейся модели возвращает результат с warnings и unknown вместо выдуманной категории. Суммы — строки целых положительных копеек или null; направление хранится отдельно."
+url: "{{baseUrl}}/api/lab/text"
+method: POST
+headers:
+  Content-Type: application/json
+  Accept: application/json
+body:
+  type: json
+  content: |-
+    {
+      "text": "string",
+      "capture_date": "string"
+    }
+settings: {}
+examples: ./.resources/Проверить распознанный или введён.resources/examples
+order: 3000

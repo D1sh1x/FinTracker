@@ -1,0 +1,10 @@
+$kind: http-request
+name: Состояние модели и каталог категорий
+description: ""
+url: "{{baseUrl}}/api/lab/status"
+method: GET
+headers:
+  Accept: application/json
+settings: {}
+examples: ./.resources/Состояние модели и каталог категор.resources/examples
+order: 1000

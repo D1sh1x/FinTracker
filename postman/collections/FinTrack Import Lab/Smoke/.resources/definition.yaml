@@ -1,0 +1,6 @@
+{
+  "$kind": "collection",
+  "name": "Smoke",
+  "description": "Synthetic local test. Does not write to finance database.",
+  "order": 0
+}

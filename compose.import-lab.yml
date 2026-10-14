@@ -1,0 +1,30 @@
+name: fintrack-lab
+services:
+  qwen:
+    image: ghcr.io/ggml-org/llama.cpp:server-b10884@sha256:9116e6ed0f288247a9daaa610a3a30c061af2b1d6ee8c9acc0d402b65ec87c29
+    command: ["--model", "/models/Qwen_Qwen3-4B-Instruct-2507-Q4_K_M.gguf", "--alias", "qwen3-4b", "--host", "0.0.0.0", "--port", "8080", "--ctx-size", "4096", "--threads", "${LAB_THREADS:-4}", "--threads-batch", "${LAB_THREADS:-4}", "--parallel", "1", "--gpu-layers", "${LAB_GPU_LAYERS:-0}", "--metrics", "--no-webui", "--log-disable"]
+    volumes: ["./.local/models:/models:ro"]
+    ports: ["127.0.0.1:8091:8080"]
+    mem_limit: 8g
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 90
+      start_period: 20s
+  lab:
+    build: { context: ., dockerfile: infra/import-lab.Dockerfile }
+    environment:
+      LAB_MODEL_URL: http://qwen:8080
+      LAB_MODE: ${LAB_MODE:-cpu}
+    ports: ["127.0.0.1:8090:8090"]
+    mem_limit: 2g
+    depends_on:
+      qwen: { condition: service_healthy }
+    read_only: true
+    tmpfs: ["/tmp:size=128m,mode=1777"]
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8090/api/lab/status"]
+      interval: 10s
+      timeout: 5s
+      retries: 10

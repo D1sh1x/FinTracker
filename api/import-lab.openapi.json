@@ -1,0 +1,590 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ФинТрек · Import lab",
+    "version": "0.1.0",
+    "description": "Изолированный локальный тест Tesseract rus+eng и Qwen3-4B-Instruct-2507 Q4_K_M. Все изображения обрабатываются локально и не сохраняются на сервере. Подтверждение и запись операций не реализованы."
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8090"
+    }
+  ],
+  "paths": {
+    "/api/lab/status": {
+      "get": {
+        "tags": [
+          "Import lab"
+        ],
+        "operationId": "lab_status",
+        "summary": "Состояние модели и каталог категорий",
+        "responses": {
+          "200": {
+            "description": "Результат",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Status"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lab/analyze": {
+      "post": {
+        "tags": [
+          "Import lab"
+        ],
+        "operationId": "lab_analyze",
+        "summary": "Распознать PNG/JPEG и классифицировать строки",
+        "description": "Локальная лаборатория: не создаёт операций в финансовой базе. Категория unknown означает «Не определено». При недоступной/ошибающейся модели возвращает результат с warnings и unknown вместо выдуманной категории. Все операции считаются рублёвыми: валюта фиксирована RUB и не определяется по OCR. Суммы — строки целых положительных копеек или null; направление хранится отдельно. bank_category — опциональный контекст отдельно от названия.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "image"
+                ],
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "PNG/JPEG, до 10 МБ и 20 млн пикселей"
+                  },
+                  "capture_date": {
+                    "type": "string",
+                    "description": "Дата съёмки YYYY-MM-DD для относительных дат и пропущенного года"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Результат",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Result"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Результат",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Результат",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Результат",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lab/text": {
+      "post": {
+        "tags": [
+          "Import lab"
+        ],
+        "operationId": "lab_text",
+        "summary": "Проверить распознанный или введённый текст",
+        "description": "Локальная лаборатория: не создаёт операций в финансовой базе. Категория unknown означает «Не определено». При недоступной/ошибающейся модели возвращает результат с warnings и unknown вместо выдуманной категории. Все операции считаются рублёвыми: валюта фиксирована RUB и не определяется по OCR. Суммы — строки целых положительных копеек или null; направление хранится отдельно. bank_category — опциональный контекст отдельно от названия.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "text"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "maxLength": 64000
+                  },
+                  "capture_date": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Результат",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Result"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Результат",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Результат",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Результат",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/lab/classify": {
+      "post": {
+        "tags": [
+          "Import lab"
+        ],
+        "operationId": "lab_classify",
+        "summary": "Переклассифицировать исправленные описания",
+        "description": "Локальная лаборатория: не создаёт операций в финансовой базе. Категория unknown означает «Не определено». При недоступной/ошибающейся модели возвращает результат с warnings и unknown вместо выдуманной категории. Все операции считаются рублёвыми: валюта фиксирована RUB и не определяется по OCR. Суммы — строки целых положительных копеек или null; направление хранится отдельно. bank_category — опциональный контекст отдельно от названия.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "rows"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "rows": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 30,
+                    "items": {
+                      "$ref": "#/components/schemas/RowInput"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Результат",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Result"
+                }
+              }
+            }
+          },
+          "408": {
+            "description": "Результат",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Результат",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Результат",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": [
+              "code",
+              "message"
+            ],
+            "properties": {
+              "code": {
+                "type": "string"
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "Row": {
+        "type": "object",
+        "required": [
+          "id",
+          "description",
+          "type",
+          "amount_minor",
+          "date",
+          "source",
+          "category_id",
+          "category_name",
+          "reason",
+          "issues"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "income",
+              "expense",
+              "unknown"
+            ]
+          },
+          "amount_minor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source": {
+            "type": "string"
+          },
+          "category_id": {
+            "type": "string"
+          },
+          "category_name": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "issues": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bank_category": {
+            "type": "string",
+            "maxLength": 120,
+            "description": "Отдельная банковская подпись для категоризации; не входит в название операции."
+          }
+        }
+      },
+      "RowInput": {
+        "type": "object",
+        "required": [
+          "id",
+          "description",
+          "type"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "income",
+              "expense",
+              "unknown"
+            ]
+          },
+          "amount_minor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "source": {
+            "type": "string"
+          },
+          "category_id": {
+            "type": "string"
+          },
+          "category_name": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "issues": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "bank_category": {
+            "type": "string",
+            "maxLength": 120
+          }
+        },
+        "additionalProperties": false
+      },
+      "Result": {
+        "type": "object",
+        "required": [
+          "model",
+          "ocr",
+          "text",
+          "lines",
+          "rows",
+          "warnings",
+          "metrics"
+        ],
+        "properties": {
+          "model": {
+            "type": "string"
+          },
+          "ocr": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string",
+            "description": "Исходный полный проход OCR; суммы извлекаются из него. Уточнённые названия находятся в rows.description и опциональных lines.name."
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Row"
+            }
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "text",
+                "confidence",
+                "box"
+              ],
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "confidence": {
+                  "type": "number"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Повторный OCR только области названия; не заменяет сумму или знак."
+                },
+                "name_confidence": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100
+                },
+                "box": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  },
+                  "minItems": 4,
+                  "maxItems": 4
+                }
+              }
+            }
+          },
+          "metrics": {
+            "type": "object",
+            "required": [
+              "ocr_ms",
+              "model_ms",
+              "total_ms",
+              "prompt_tokens",
+              "generated_tokens",
+              "tokens_per_second"
+            ],
+            "properties": {
+              "ocr_ms": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "model_ms": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "total_ms": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "prompt_tokens": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "generated_tokens": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "tokens_per_second": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
+          }
+        }
+      },
+      "Status": {
+        "type": "object",
+        "required": [
+          "ready",
+          "model",
+          "mode",
+          "ocr",
+          "message",
+          "categories"
+        ],
+        "properties": {
+          "ready": {
+            "type": "boolean"
+          },
+          "model": {
+            "type": "string"
+          },
+          "mode": {
+            "type": "string"
+          },
+          "ocr": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "name",
+                "type"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

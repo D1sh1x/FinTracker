@@ -1,0 +1,10 @@
+{
+  "$kind": "collection",
+  "name": "FinTrack Import Lab",
+  "variables": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8090"
+    }
+  ]
+}
