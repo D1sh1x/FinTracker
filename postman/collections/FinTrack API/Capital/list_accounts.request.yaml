@@ -1,0 +1,8 @@
+{
+  "$kind": "http-request",
+  "name": "All accounts including archives with exact balances",
+  "description": "All accounts including archives with exact balances",
+  "order": 1000,
+  "method": "GET",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/accounts"
+}

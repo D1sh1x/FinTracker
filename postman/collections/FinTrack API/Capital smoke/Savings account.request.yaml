@@ -1,0 +1,21 @@
+{
+  "$kind": "http-request",
+  "name": "Savings account",
+  "order": 4000,
+  "method": "POST",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/accounts",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 201',()=>pm.response.to.have.status(201));\n\n"
+    }
+  ],
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "type": "json",
+    "content": "{\n  \"id\": \"{{savings_id}}\",\n  \"name\": \"Подушка\",\n  \"kind\": \"savings\",\n  \"opening_balance_minor\": \"0\",\n  \"tracking_start_date\": \"{{today}}\"\n}"
+  }
+}

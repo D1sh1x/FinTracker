@@ -1,0 +1,8 @@
+{
+  "$kind": "http-request",
+  "name": "Cancel transfer with version; repeats do not restore it",
+  "description": "Cancel transfer with version; repeats do not restore it",
+  "order": 6000,
+  "method": "DELETE",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/transfers/{{transfer_id}}?version={{version}}"
+}

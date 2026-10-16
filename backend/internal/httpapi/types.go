@@ -38,10 +38,15 @@ type Profile struct {
 }
 
 type Wallet struct {
-	ID      string `json:"id"`
-	Opening string `json:"opening_balance_minor"`
-	Start   string `json:"tracking_start_date"`
-	Version int    `json:"version"`
+	ProfileID string `json:"profile_id"`
+	Name      string `json:"name"`
+	Kind      string `json:"kind"`
+	Primary   bool   `json:"is_primary"`
+	Archived  bool   `json:"is_archived"`
+	ID        string `json:"id"`
+	Opening   string `json:"opening_balance_minor"`
+	Start     string `json:"tracking_start_date"`
+	Version   int    `json:"version"`
 }
 
 type Category struct {
@@ -124,6 +129,7 @@ type categoryPatch struct {
 }
 
 type operationInput struct {
+	WalletID   string `json:"wallet_id"`
 	ID         string `json:"id"`
 	Type       string `json:"type"`
 	Amount     string `json:"amount_minor"`
@@ -133,6 +139,7 @@ type operationInput struct {
 }
 
 type operationPatch struct {
+	WalletID   *string `json:"wallet_id"`
 	Type       *string `json:"type"`
 	Amount     *string `json:"amount_minor"`
 	CategoryID *string `json:"category_id"`
@@ -178,6 +185,14 @@ func (s *Server) NewHandler() http.Handler {
 		"GET /api/v1/profiles/{p}":                                  s.getProfile,
 		"PATCH /api/v1/profiles/{p}":                                s.patchProfile,
 		"GET /api/v1/profiles/{p}/wallet":                           s.getWallet,
+		"GET /api/v1/profiles/{p}/accounts":                         s.listAccounts,
+		"POST /api/v1/profiles/{p}/accounts":                        s.createAccount,
+		"PATCH /api/v1/profiles/{p}/accounts/{id}":                  s.patchAccount,
+		"GET /api/v1/profiles/{p}/capital":                          s.getCapital,
+		"GET /api/v1/profiles/{p}/transfers":                        s.listTransfers,
+		"POST /api/v1/profiles/{p}/transfers":                       s.createTransfer,
+		"DELETE /api/v1/profiles/{p}/transfers/{id}":                s.deleteTransfer,
+		"POST /api/v1/profiles/{p}/accounts/{id}/valuations":        s.createValuation,
 		"PATCH /api/v1/profiles/{p}/wallet":                         s.patchWallet,
 		"GET /api/v1/profiles/{p}/categories":                       s.listCategories,
 		"POST /api/v1/profiles/{p}/categories":                      s.createCategory,

@@ -57,9 +57,12 @@ func (s *Server) validateOperation(r *http.Request, db queryer, person Profile, 
 	if category.Archived && (previous == nil || previous.CategoryID != category.ID) {
 		return conflict("category_archived", "Категория в архиве. Выберите другую")
 	}
-	wallet, _, err := readWallet(r, db, person.ID)
+	wallet, err := operationAccount(r, db, person.ID, row.WalletID)
 	if err != nil {
 		return err
+	}
+	if wallet.Archived && (previous == nil || previous.WalletID != wallet.ID) {
+		return conflict("account_archived", "Счёт в архиве. Выберите другой")
 	}
 	if row.Date < wallet.Start {
 		return invalid("occurred_on", "Дата раньше начала учёта. Измените дату или начало учёта в настройках")
@@ -102,7 +105,11 @@ func (s *Server) createOperation(w http.ResponseWriter, r *http.Request) error {
 		if existing.DeletedAt != nil {
 			return &apiError{Status: 410, Code: "transaction_deleted", Message: "Эта операция была удалена"}
 		}
-		if existing.Type != body.Type || existing.Amount != body.Amount || existing.CategoryID != body.CategoryID || existing.Date != body.Date || existing.Note != body.Note {
+		account, err := operationAccount(r, tx, person.ID, body.WalletID)
+		if err != nil {
+			return err
+		}
+		if existing.WalletID != account.ID || existing.Type != body.Type || existing.Amount != body.Amount || existing.CategoryID != body.CategoryID || existing.Date != body.Date || existing.Note != body.Note {
 			return duplicate()
 		}
 		raw, err = visibleOperation(r, tx, person.ID, body.ID)
@@ -114,7 +121,7 @@ func (s *Server) createOperation(w http.ResponseWriter, r *http.Request) error {
 	if !errors.Is(err, pgx.ErrNoRows) {
 		return err
 	}
-	row := Operation{ID: body.ID, ProfileID: person.ID, Type: body.Type, Amount: body.Amount, CategoryID: body.CategoryID, Date: body.Date, Note: body.Note}
+	row := Operation{ID: body.ID, ProfileID: person.ID, WalletID: body.WalletID, Type: body.Type, Amount: body.Amount, CategoryID: body.CategoryID, Date: body.Date, Note: body.Note}
 	if err := s.validateOperation(r, tx, person, &row, nil); err != nil {
 		return err
 	}
@@ -171,6 +178,9 @@ func (s *Server) patchOperation(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 	row := existing
+	if body.WalletID != nil {
+		row.WalletID = *body.WalletID
+	}
 	if body.Type != nil {
 		row.Type = *body.Type
 	}
@@ -190,7 +200,7 @@ func (s *Server) patchOperation(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 	amount, _ := strconv.ParseInt(row.Amount, 10, 64)
-	if _, err := tx.Exec(r.Context(), "UPDATE transactions SET category_id=$3,type=$4,amount_minor=$5,occurred_on=$6,note=$7,version=version+1,updated_at=now() WHERE profile_id=$1 AND id=$2", person.ID, id, row.CategoryID, row.Type, amount, row.Date, row.Note); err != nil {
+	if _, err := tx.Exec(r.Context(), "UPDATE transactions SET category_id=$3,type=$4,amount_minor=$5,occurred_on=$6,note=$7,wallet_id=$8,version=version+1,updated_at=now() WHERE profile_id=$1 AND id=$2", person.ID, id, row.CategoryID, row.Type, amount, row.Date, row.Note, row.WalletID); err != nil {
 		return err
 	}
 	raw, err := visibleOperation(r, tx, person.ID, id)

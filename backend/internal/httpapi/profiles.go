@@ -79,7 +79,7 @@ func (s *Server) createProfile(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 	start := s.today(zone)[:7] + "-01"
-	if _, err = tx.Exec(r.Context(), "INSERT INTO wallets(id,profile_id,name,opening_balance_minor,tracking_start_date,version,created_at,updated_at) VALUES($1,$2,'Общий баланс',0,$3,1,now(),now())", uuid.NewString(), id, start); err != nil {
+	if _, err = tx.Exec(r.Context(), "INSERT INTO wallets(id,profile_id,name,opening_balance_minor,tracking_start_date,version,created_at,updated_at,is_primary) VALUES($1,$2,'Общий баланс',0,$3,1,now(),now(),true)", uuid.NewString(), id, start); err != nil {
 		return err
 	}
 	for _, category := range initialCategories {
@@ -142,7 +142,7 @@ func (s *Server) patchProfile(w http.ResponseWriter, r *http.Request) error {
 }
 
 func readWallet(r *http.Request, db queryer, p string) (Wallet, json.RawMessage, error) {
-	raw, err := rawRow(r.Context(), db, "SELECT "+walletJSON+" FROM wallets w WHERE profile_id=$1", p)
+	raw, err := rawRow(r.Context(), db, "SELECT "+walletJSON+" FROM wallets w WHERE profile_id=$1 AND is_primary", p)
 	var wallet Wallet
 	if err == nil {
 		err = json.Unmarshal(raw, &wallet)
@@ -194,7 +194,7 @@ func (s *Server) patchWallet(w http.ResponseWriter, r *http.Request) error {
 			return invalid("tracking_start_date", "Начало учёта не может быть в будущем")
 		}
 		var before bool
-		if err := tx.QueryRow(r.Context(), "SELECT EXISTS(SELECT 1 FROM transactions WHERE profile_id=$1 AND deleted_at IS NULL AND occurred_on<$2)", person.ID, *body.Start).Scan(&before); err != nil {
+		if err := tx.QueryRow(r.Context(), "SELECT EXISTS(SELECT 1 FROM transactions WHERE profile_id=$1 AND wallet_id=$3 AND deleted_at IS NULL AND occurred_on<$2 UNION ALL SELECT 1 FROM account_transfers WHERE profile_id=$1 AND (from_account_id=$3 OR to_account_id=$3) AND deleted_at IS NULL AND occurred_on<$2)", person.ID, *body.Start, wallet.ID).Scan(&before); err != nil {
 			return err
 		}
 		if before {
@@ -202,7 +202,7 @@ func (s *Server) patchWallet(w http.ResponseWriter, r *http.Request) error {
 		}
 		wallet.Start = *body.Start
 	}
-	if _, err = tx.Exec(r.Context(), "UPDATE wallets SET opening_balance_minor=$2,tracking_start_date=$3,version=version+1,updated_at=now() WHERE profile_id=$1", person.ID, opening, wallet.Start); err != nil {
+	if _, err = tx.Exec(r.Context(), "UPDATE wallets SET opening_balance_minor=$2,tracking_start_date=$3,version=version+1,updated_at=now() WHERE profile_id=$1 AND is_primary", person.ID, opening, wallet.Start); err != nil {
 		return err
 	}
 	_, raw, err := readWallet(r, tx, person.ID)

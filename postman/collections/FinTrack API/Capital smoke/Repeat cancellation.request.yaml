@@ -1,0 +1,14 @@
+{
+  "$kind": "http-request",
+  "name": "Repeat cancellation",
+  "order": 14000,
+  "method": "DELETE",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/transfers/{{transfer_id}}?version=1",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 204',()=>pm.response.to.have.status(204));\n\n"
+    }
+  ]
+}

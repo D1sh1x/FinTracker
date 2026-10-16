@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { CategoryBudgetsPanel } from "./CategoryBudgets";
 import { ImportScreenshots } from "./ImportScreenshots";
+import { CapitalPage } from "./Capital";
 import type { FormEvent } from "react";
 import {
   useInfiniteQuery,
@@ -29,6 +30,7 @@ import {
   Search,
   SlidersHorizontal,
   ImagePlus,
+  Landmark,
 } from "lucide-react";
 import {
   ApiError,
@@ -42,6 +44,7 @@ import {
   type Transaction,
   type Wallet,
   type Page,
+  type Account,
 } from "./api";
 import {
   CategoryIcon,
@@ -74,9 +77,11 @@ type Section =
   | "budget"
   | "categories"
   | "settings"
-  | "imports";
+  | "imports"
+  | "capital";
 const navigation = [
   { id: "overview", label: "Обзор", icon: LayoutDashboard },
+  { id: "capital", label: "Капитал", icon: Landmark },
   { id: "transactions", label: "Операции", icon: ArrowLeftRight },
   { id: "budget", label: "Бюджет", icon: PieChart },
   { id: "categories", label: "Категории", icon: Layers3 },
@@ -310,6 +315,11 @@ function Workspace({
     queryKey: [...key, "wallet"],
     queryFn: ({ signal }) => request<Wallet>(`${prefix}/wallet`, { signal }),
   });
+  const accounts = useQuery({
+    queryKey: [...key, "accounts"],
+    queryFn: ({ signal }) =>
+      request<{ items: Account[] }>(`${prefix}/accounts`, { signal }),
+  });
   const budget = useQuery({
     queryKey: [...key, "budget", month],
     queryFn: async ({ signal }) => {
@@ -375,6 +385,7 @@ function Workspace({
     categories: "Ваши категории",
     settings: "Настройки",
     imports: "Импорт из скриншота",
+    capital: "Ваш капитал",
   }[section];
   const editedCategoryBudget = summary.data?.category_budgets.items.find(
     (item) => item.category_id === categoryBudgetEditor,
@@ -386,8 +397,10 @@ function Workspace({
     categories: "Учёт, который подходит именно вам.",
     settings: "Ваше пространство, ваши правила.",
     imports: "Сначала проверка, затем запись в учёт.",
+    capital: "Все счета и накопления. Одна понятная картина.",
   }[section];
-  const sharedError = summary.error ?? categories.error ?? wallet.error;
+  const sharedError =
+    summary.error ?? categories.error ?? wallet.error ?? accounts.error;
   return (
     <div className="app-shell">
       <aside className="sidebar">
@@ -517,14 +530,21 @@ function Workspace({
               error={sharedError}
               onRetry={() => client.invalidateQueries({ queryKey: key })}
             />
-          ) : !summary.data || !categories.data || !wallet.data ? (
+          ) : !summary.data ||
+            !categories.data ||
+            !wallet.data ||
+            !accounts.data ? (
             <Loading />
           ) : (
             <>
+              {section === "capital" && (
+                <CapitalPage person={person} onComplete={updated} />
+              )}
               {section === "imports" && (
                 <ImportScreenshots
                   person={person}
                   wallet={wallet.data}
+                  accounts={accounts.data.items}
                   categories={categories.data.items}
                   onComplete={updated}
                 />
@@ -551,14 +571,14 @@ function Workspace({
                   <div className="stats-grid">
                     <div className="stat-card balance">
                       <div className="stat-label">
-                        <span>Общий баланс</span>
+                        <span>Деньги на счетах</span>
                         <WalletIcon size={19} />
                       </div>
                       <strong className="stat-value">
                         {formatMoney(summary.data.balance_minor, false)}
                       </strong>
                       <span className="stat-footnote">
-                        За весь период учёта
+                        Без инвестиционного портфеля
                         <ArrowUpRight size={17} />
                       </span>
                       <div className="balance-decoration" aria-hidden="true" />
@@ -787,6 +807,7 @@ function Workspace({
           key={editor ? `${editor.id}:${editor.version}` : "new"}
           person={person}
           wallet={wallet.data}
+          accounts={accounts.data?.items ?? []}
           categories={categories.data.items}
           existing={editor}
           onClose={() => setEditor(undefined)}

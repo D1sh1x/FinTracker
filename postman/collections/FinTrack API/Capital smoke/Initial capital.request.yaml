@@ -1,0 +1,14 @@
+{
+  "$kind": "http-request",
+  "name": "Initial capital",
+  "order": 6000,
+  "method": "GET",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/capital",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 200',()=>pm.response.to.have.status(200));\n\nconst x=pm.response.json();pm.test('Exact initial capital',()=>{pm.expect(x.total_minor).to.equal('1200000');pm.expect(x.accounts).to.have.length(3);});"
+    }
+  ]
+}

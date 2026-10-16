@@ -22,6 +22,7 @@ import (
 )
 
 type ScreenshotImport struct {
+	WalletID      string                 `json:"wallet_id"`
 	ID            string                 `json:"id"`
 	ProfileID     string                 `json:"profile_id"`
 	CaptureDate   string                 `json:"capture_date"`
@@ -48,16 +49,18 @@ type importEditRow struct {
 	CategoryID  string  `json:"category_id"`
 }
 type importEditInput struct {
-	Version int             `json:"version"`
-	Rows    []importEditRow `json:"rows"`
+	WalletID *string         `json:"wallet_id,omitempty"`
+	Version  int             `json:"version"`
+	Rows     []importEditRow `json:"rows"`
 }
 type importSelection struct {
 	ID             string `json:"id"`
 	AllowDuplicate bool   `json:"allow_duplicate"`
 }
 type importConfirmInput struct {
-	Version int               `json:"version"`
-	Rows    []importSelection `json:"rows"`
+	WalletID string            `json:"wallet_id,omitempty"`
+	Version  int               `json:"version"`
+	Rows     []importSelection `json:"rows"`
 }
 type importVersionInput struct {
 	Version int `json:"version"`
@@ -67,11 +70,11 @@ func readImport(r *http.Request, db queryer, p, id string, lock bool) (Screensho
 	var job ScreenshotImport
 	var result, receipt []byte
 	var hash *string
-	query := `SELECT id::text,profile_id::text,to_char(capture_date,'YYYY-MM-DD'),status,version,created_at,updated_at,result,error,receipt,confirmed_hash FROM screenshot_imports WHERE profile_id=$1 AND id=$2`
+	query := `SELECT id::text,profile_id::text,to_char(capture_date,'YYYY-MM-DD'),status,version,created_at,updated_at,result,error,receipt,confirmed_hash,account_id::text FROM screenshot_imports WHERE profile_id=$1 AND id=$2`
 	if lock {
 		query += " FOR UPDATE"
 	}
-	err := db.QueryRow(r.Context(), query, p, id).Scan(&job.ID, &job.ProfileID, &job.CaptureDate, &job.Status, &job.Version, &job.CreatedAt, &job.UpdatedAt, &result, &job.Error, &receipt, &hash)
+	err := db.QueryRow(r.Context(), query, p, id).Scan(&job.ID, &job.ProfileID, &job.CaptureDate, &job.Status, &job.Version, &job.CreatedAt, &job.UpdatedAt, &result, &job.Error, &receipt, &hash, &job.WalletID)
 	if err != nil {
 		return job, err
 	}
@@ -273,7 +276,11 @@ func (s *Server) uploadImport(w http.ResponseWriter, r *http.Request) error {
 	code := 200
 	if errors.Is(err, pgx.ErrNoRows) {
 		id = uuid.NewString()
-		_, err = tx.Exec(r.Context(), "INSERT INTO screenshot_imports(id,profile_id,file_sha256,capture_date,status,image) VALUES($1,$2,$3,$4,'queued',$5)", id, person.ID, hash, capture, data)
+		wallet, _, walletErr := readWallet(r, tx, person.ID)
+		if walletErr != nil {
+			return walletErr
+		}
+		_, err = tx.Exec(r.Context(), "INSERT INTO screenshot_imports(id,profile_id,file_sha256,capture_date,status,image,account_id) VALUES($1,$2,$3,$4,'queued',$5,$6)", id, person.ID, hash, capture, data, wallet.ID)
 		code = 202
 	} else if err == nil && (status == "failed" || status == "cancelled") {
 		_, err = tx.Exec(r.Context(), "UPDATE screenshot_imports SET status='queued',version=version+1,image=$3,capture_date=$4,result='{}',error='',lease_until=NULL,lease_token=NULL,updated_at=now() WHERE profile_id=$1 AND id=$2", person.ID, id, data, capture)
@@ -333,6 +340,16 @@ func (s *Server) editImport(w http.ResponseWriter, r *http.Request) error {
 	}
 	if err = mutableImport(job, body.Version); err != nil {
 		return err
+	}
+	if body.WalletID != nil {
+		account, err := operationAccount(r, tx, person.ID, *body.WalletID)
+		if err != nil {
+			return err
+		}
+		if account.Archived {
+			return conflict("account_archived", "Выберите активный счёт")
+		}
+		job.WalletID = account.ID
 	}
 	previous := map[string]importlab.Row{}
 	for _, row := range job.Result.Rows {
@@ -409,7 +426,7 @@ func (s *Server) editImport(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	_, err = tx.Exec(r.Context(), "UPDATE screenshot_imports SET result=$3,version=version+1,updated_at=now() WHERE profile_id=$1 AND id=$2", person.ID, id, result)
+	_, err = tx.Exec(r.Context(), "UPDATE screenshot_imports SET result=$3,account_id=$4,version=version+1,updated_at=now() WHERE profile_id=$1 AND id=$2", person.ID, id, result, job.WalletID)
 	if err != nil {
 		return err
 	}
@@ -459,6 +476,10 @@ func (s *Server) confirmImport(w http.ResponseWriter, r *http.Request) error {
 	if err = mutableImport(job, body.Version); err != nil {
 		return err
 	}
+	accountID := body.WalletID
+	if accountID == "" {
+		accountID = job.WalletID
+	}
 	source := map[string]importlab.Row{}
 	for _, row := range job.Result.Rows {
 		source[row.ID] = row
@@ -481,7 +502,7 @@ func (s *Server) confirmImport(w http.ResponseWriter, r *http.Request) error {
 				return invalid(row.ID, "Выберите активную категорию")
 			}
 		}
-		op := Operation{ID: uuid.NewSHA1(uuid.MustParse(job.ID), []byte(row.ID)).String(), ProfileID: person.ID, Type: row.Type, Amount: *row.Amount, Date: *row.Date, Note: row.Description, CategoryID: categoryID}
+		op := Operation{ID: uuid.NewSHA1(uuid.MustParse(job.ID), []byte(row.ID)).String(), ProfileID: person.ID, WalletID: accountID, Type: row.Type, Amount: *row.Amount, Date: *row.Date, Note: row.Description, CategoryID: categoryID}
 		if err = s.validateOperation(r, tx, person, &op, nil); err != nil {
 			return err
 		}
@@ -511,7 +532,7 @@ func (s *Server) confirmImport(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	_, err = tx.Exec(r.Context(), "UPDATE screenshot_imports SET status='confirmed',version=version+1,image=NULL,confirmed_hash=$3,receipt=$4,updated_at=now() WHERE profile_id=$1 AND id=$2", person.ID, id, hash, receiptJSON)
+	_, err = tx.Exec(r.Context(), "UPDATE screenshot_imports SET status='confirmed',version=version+1,image=NULL,confirmed_hash=$3,receipt=$4,account_id=$5,updated_at=now() WHERE profile_id=$1 AND id=$2", person.ID, id, hash, receiptJSON, operations[0].WalletID)
 	if err != nil {
 		return err
 	}

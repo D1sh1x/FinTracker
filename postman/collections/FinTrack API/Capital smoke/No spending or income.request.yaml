@@ -1,0 +1,14 @@
+{
+  "$kind": "http-request",
+  "name": "No spending or income",
+  "order": 12000,
+  "method": "GET",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/summary?month={{month}}",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 200',()=>pm.response.to.have.status(200));\n\nconst x=pm.response.json();pm.test('Transfers and valuations excluded',()=>{pm.expect(x.income_minor).to.equal('0');pm.expect(x.expense_minor).to.equal('0');pm.expect(x.balance_minor).to.equal('950000');});"
+    }
+  ]
+}

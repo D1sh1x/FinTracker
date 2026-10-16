@@ -1,0 +1,15 @@
+{
+  "$kind": "http-request",
+  "name": "Create a RUB account; same UUID and content retries return 200",
+  "description": "Create a RUB account; same UUID and content retries return 200",
+  "order": 2000,
+  "method": "POST",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/accounts",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "type": "json",
+    "content": "{\n  \"id\": \"{{$guid}}\",\n  \"name\": \"Название\",\n  \"kind\": \"cash\",\n  \"opening_balance_minor\": \"0\",\n  \"tracking_start_date\": \"{{today}}\"\n}"
+  }
+}

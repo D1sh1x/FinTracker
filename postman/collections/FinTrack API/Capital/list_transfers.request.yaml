@@ -1,0 +1,8 @@
+{
+  "$kind": "http-request",
+  "name": "Latest 100 live transfers; excluded from income/expense budgets",
+  "description": "Latest 100 live transfers; excluded from income/expense budgets",
+  "order": 4000,
+  "method": "GET",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/transfers"
+}

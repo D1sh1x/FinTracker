@@ -1,0 +1,14 @@
+{
+  "$kind": "http-request",
+  "name": "Final capital",
+  "order": 16000,
+  "method": "GET",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/capital",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 200',()=>pm.response.to.have.status(200));\n\nconst x=pm.response.json();pm.test('Cancellation preserves total',()=>{pm.expect(x.total_minor).to.equal('1250000');pm.expect(x.cash_minor).to.equal('1000000');pm.expect(x.investment_minor).to.equal('250000');});"
+    }
+  ]
+}

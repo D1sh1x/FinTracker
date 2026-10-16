@@ -9,6 +9,7 @@ import {
   type Transaction,
   type Wallet,
   type Budget,
+  type Account,
 } from "./api";
 import { CategoryIcon, FormError, iconNames, Modal } from "./components";
 import { formatMoney, moneyInput, parseMoney, todayIn } from "./money";
@@ -81,6 +82,7 @@ export function ProfileEditor({
 export function TransactionEditor({
   person,
   wallet,
+  accounts,
   categories,
   existing,
   onClose,
@@ -89,6 +91,7 @@ export function TransactionEditor({
 }: {
   person: Profile;
   wallet: Wallet;
+  accounts: Account[];
   categories: Category[];
   existing: Transaction | null;
   onClose: () => void;
@@ -106,6 +109,8 @@ export function TransactionEditor({
     );
   };
   const [id] = useState(() => existing?.id ?? newId());
+  const [accountId, setAccountId] = useState(existing?.wallet_id ?? wallet.id);
+  const currentAccount = accounts.find((account) => account.id === accountId);
   const [type, setType] = useState<"income" | "expense">(
     existing?.type ?? "expense",
   );
@@ -133,8 +138,9 @@ export function TransactionEditor({
       type !== existing.type ||
       category !== existing.category_id ||
       date !== existing.occurred_on ||
-      note !== existing.note
-    : !!amount || !!note;
+      note !== existing.note ||
+      accountId !== existing.wallet_id
+    : !!amount || !!note || accountId !== wallet.id;
   async function submit(event: FormEvent) {
     event.preventDefault();
     setError(null);
@@ -149,6 +155,7 @@ export function TransactionEditor({
     setBusy(true);
     try {
       const body = {
+        wallet_id: accountId,
         type,
         amount_minor,
         category_id: category,
@@ -217,6 +224,27 @@ export function TransactionEditor({
           </button>
         </div>
         <label>
+          Счёт
+          <select
+            aria-label="Счёт"
+            value={accountId}
+            onChange={(event) => setAccountId(event.target.value)}
+            required
+          >
+            {accounts
+              .filter(
+                (account) =>
+                  !account.is_archived || account.id === existing?.wallet_id,
+              )
+              .map((account) => (
+                <option key={account.id} value={account.id}>
+                  {account.name}
+                  {account.is_archived ? " (архив)" : ""}
+                </option>
+              ))}
+          </select>
+        </label>
+        <label>
           Сумма, ₽
           <input
             className="amount-input"
@@ -261,7 +289,9 @@ export function TransactionEditor({
           <input
             type="date"
             required
-            min={wallet.tracking_start_date}
+            min={
+              currentAccount?.tracking_start_date ?? wallet.tracking_start_date
+            }
             max={
               date === existing?.occurred_on && date > todayIn(person.timezone)
                 ? undefined

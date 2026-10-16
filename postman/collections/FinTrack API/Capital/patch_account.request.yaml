@@ -1,0 +1,15 @@
+{
+  "$kind": "http-request",
+  "name": "Rename/archive account using optimistic version; primary account cannot be archived",
+  "description": "Rename/archive account using optimistic version; primary account cannot be archived",
+  "order": 3000,
+  "method": "PATCH",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/accounts/{{account_id}}",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "type": "json",
+    "content": "{\n  \"name\": \"Название\",\n  \"is_archived\": false,\n  \"version\": 1\n}"
+  }
+}

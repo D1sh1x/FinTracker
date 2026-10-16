@@ -11,6 +11,9 @@ export type CategoryBudgets = components["schemas"]["CategoryBudgetsOut"];
 export type Page = components["schemas"]["TransactionsOut"];
 export type ScreenshotImport = components["schemas"]["ScreenshotImport"];
 export type ScreenshotReceipt = components["schemas"]["ScreenshotReceipt"];
+export type Account = components["schemas"]["Account"];
+export type Capital = components["schemas"]["Capital"];
+export type Transfer = components["schemas"]["Transfer"];
 
 export class ApiError extends Error {
   constructor(

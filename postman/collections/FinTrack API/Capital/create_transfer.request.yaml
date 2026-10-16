@@ -1,0 +1,15 @@
+{
+  "$kind": "http-request",
+  "name": "Atomically transfer between own accounts without changing total capital",
+  "description": "Atomically transfer between own accounts without changing total capital",
+  "order": 5000,
+  "method": "POST",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/transfers",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "type": "json",
+    "content": "{\n  \"id\": \"{{$guid}}\",\n  \"from_account_id\": \"{{from_account_id}}\",\n  \"to_account_id\": \"{{to_account_id}}\",\n  \"amount_minor\": \"0\",\n  \"occurred_on\": \"{{today}}\",\n  \"note\": \"Название\"\n}"
+  }
+}

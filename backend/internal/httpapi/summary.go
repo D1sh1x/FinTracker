@@ -51,36 +51,33 @@ func (s *Server) summary(w http.ResponseWriter, r *http.Request) error {
 	if err != nil {
 		return err
 	}
-	wallet, _, err := readWallet(r, tx, person.ID)
-	if err != nil {
+	end := start.AddDate(0, 1, 0).Format(time.DateOnly)
+	var cash string
+	if err := tx.QueryRow(r.Context(), "SELECT COALESCE(SUM(e.delta_minor),0)::text FROM account_entries e JOIN wallets w ON w.id=e.account_id WHERE e.profile_id=$1 AND w.kind<>'investment'", person.ID).Scan(&cash); err != nil {
 		return err
 	}
-	end := start.AddDate(0, 1, 0).Format(time.DateOnly)
-	balance, income, expense := exact(wallet.Opening), new(big.Int), new(big.Int)
+	balance, income, expense := exact(cash), new(big.Int), new(big.Int)
 	categories := []categoryTotal{}
 	categorySpent := map[string]string{}
-	rows, err := tx.Query(r.Context(), `SELECT c.id::text,c.name,c.icon,c.color,c.type,SUM(t.amount_minor)::text,
-      COALESCE(SUM(t.amount_minor) FILTER (WHERE t.occurred_on >= $2 AND t.occurred_on < $3),0)::text
+	rows, err := tx.Query(r.Context(), `SELECT c.id::text,c.name,c.icon,c.color,c.type,SUM(t.amount_minor)::text
       FROM categories c JOIN transactions t ON c.id=t.category_id
-      WHERE t.profile_id=$1 AND t.deleted_at IS NULL GROUP BY c.id
-      ORDER BY SUM(t.amount_minor) FILTER (WHERE t.occurred_on >= $2 AND t.occurred_on < $3) DESC NULLS LAST,c.name`, person.ID, start.Format(time.DateOnly), end)
+      WHERE t.profile_id=$1 AND t.deleted_at IS NULL AND t.occurred_on >= $2 AND t.occurred_on < $3 GROUP BY c.id
+      ORDER BY SUM(t.amount_minor) DESC,c.name`, person.ID, start.Format(time.DateOnly), end)
 	if err != nil {
 		return err
 	}
 	for rows.Next() {
 		var category categoryTotal
-		var kind, total string
-		if err := rows.Scan(&category.ID, &category.Name, &category.Icon, &category.Color, &kind, &total, &category.Amount); err != nil {
+		var kind string
+		if err := rows.Scan(&category.ID, &category.Name, &category.Icon, &category.Color, &kind, &category.Amount); err != nil {
 			rows.Close()
 			return err
 		}
 		monthlyAmount := exact(category.Amount)
 		if kind == "income" {
-			balance.Add(balance, exact(total))
 			income.Add(income, monthlyAmount)
 		} else {
 			categorySpent[category.ID] = category.Amount
-			balance.Sub(balance, exact(total))
 			expense.Add(expense, monthlyAmount)
 			if monthlyAmount.Sign() > 0 {
 				categories = append(categories, category)

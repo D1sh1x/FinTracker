@@ -1,0 +1,26 @@
+{
+  "$kind": "http-request",
+  "name": "Create profile",
+  "order": 1000,
+  "method": "POST",
+  "url": "{{baseUrl}}/api/v1/profiles",
+  "scripts": [
+    {
+      "type": "beforeRequest",
+      "language": "text/javascript",
+      "code": "['profile_id','savings_id','investment_id','transfer_id','valuation_id','stale_valuation_id'].forEach(k=>pm.collectionVariables.set(k,pm.variables.replaceIn('{{$guid}}')));const today=new Date(Date.now()+3*60*60*1000).toISOString().slice(0,10);pm.collectionVariables.set('today',today);pm.collectionVariables.set('month',today.slice(0,7));"
+    },
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 201',()=>pm.response.to.have.status(201));\n\n"
+    }
+  ],
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "type": "json",
+    "content": "{\n  \"id\": \"{{profile_id}}\",\n  \"name\": \"Проверка капитала\"\n}"
+  }
+}

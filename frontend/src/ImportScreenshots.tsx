@@ -17,6 +17,7 @@ import {
   type Wallet,
   type ScreenshotImport,
   type ScreenshotReceipt,
+  type Account,
 } from "./api";
 import { FormError, Loading, LoadError } from "./components";
 import { formatMoney, moneyInput, parseMoney, todayIn } from "./money";
@@ -34,6 +35,7 @@ type ReviewRow = {
   allowDuplicate: boolean;
 };
 type Confirmation = {
+  wallet_id?: string;
   version: number;
   rows: { id: string; allow_duplicate: boolean }[];
 };
@@ -49,11 +51,13 @@ const labels: Record<ScreenshotImport["status"], string> = {
 export function ImportScreenshots({
   person,
   wallet,
+  accounts,
   categories,
   onComplete,
 }: {
   person: Profile;
   wallet: Wallet;
+  accounts: Account[];
   categories: Category[];
   onComplete: () => Promise<void>;
 }) {
@@ -61,6 +65,9 @@ export function ImportScreenshots({
   const prefix = `/profiles/${person.id}/imports`;
   const queryKey = ["profile", person.id, "imports"];
   const [id, setId] = useState("");
+  const [accountId, setAccountId] = useState(wallet.id);
+  const account = accounts.find((item) => item.id === accountId);
+  const startDate = account?.tracking_start_date ?? wallet.tracking_start_date;
   const [file, setFile] = useState<File | null>(null);
   const [capture, setCapture] = useState("");
   const [preview, setPreview] = useState("");
@@ -112,6 +119,7 @@ export function ImportScreenshots({
     if (!job || dirty || loadedVersion.current === `${job.id}:${job.version}`)
       return;
     loadedVersion.current = `${job.id}:${job.version}`;
+    setAccountId(job.wallet_id);
     setRows(
       job.result.rows.map((row) => ({
         id: row.id,
@@ -245,7 +253,7 @@ export function ImportScreenshots({
     const next = await send<ScreenshotImport>(
       `${prefix}/${job.id}/rows`,
       "PATCH",
-      { version: job.version, rows: editedRows() },
+      { version: job.version, rows: editedRows(), wallet_id: accountId },
     );
     if (active.current) {
       setDirty(false);
@@ -278,7 +286,11 @@ export function ImportScreenshots({
         if (!selection.length)
           throw new Error("Выберите операции для сохранения.");
         const current = dirty ? await save() : job;
-        body = { version: current.version, rows: selection };
+        body = {
+          version: current.version,
+          rows: selection,
+          ...(accountId !== wallet.id ? { wallet_id: accountId } : {}),
+        };
         setPending(body);
       }
       const receipt = await send<ScreenshotReceipt>(
@@ -304,7 +316,11 @@ export function ImportScreenshots({
     } catch (error) {
       if (active.current) {
         setError(error as Error);
-        if (error instanceof ApiError && error.status > 0 && error.status < 500) {
+        if (
+          error instanceof ApiError &&
+          error.status > 0 &&
+          error.status < 500
+        ) {
           setPending(null);
           if (error instanceof ApiError && error.status === 409)
             await draft.refetch();
@@ -451,6 +467,34 @@ export function ImportScreenshots({
             ))}
             {editable && (
               <>
+                <label>
+                  Счёт для операций
+                  <select
+                    aria-label="Счёт для операций"
+                    value={accountId}
+                    disabled={locked}
+                    onChange={(event) => {
+                      setAccountId(event.target.value);
+                      setChecked(false);
+                      setDirty(true);
+                    }}
+                  >
+                    {accounts
+                      .filter(
+                        (item) => !item.is_archived || item.id === accountId,
+                      )
+                      .map((item) => (
+                        <option
+                          key={item.id}
+                          value={item.id}
+                          disabled={item.is_archived}
+                        >
+                          {item.name}
+                          {item.is_archived ? " (архив)" : ""}
+                        </option>
+                      ))}
+                  </select>
+                </label>
                 <p className="info-note">
                   Исправьте поля и выберите строки. «Не определено» можно
                   сохранить и разобрать позже. Два перевода между собственными
@@ -469,7 +513,7 @@ export function ImportScreenshots({
                     const invalid =
                       !row.description.trim() ||
                       !row.date ||
-                      row.date < wallet.tracking_start_date ||
+                      row.date < startDate ||
                       row.date > todayIn(person.timezone) ||
                       row.type === "unknown";
                     return (
@@ -554,7 +598,7 @@ export function ImportScreenshots({
                             Дата операции
                             <input
                               type="date"
-                              min={wallet.tracking_start_date}
+                              min={startDate}
                               max={todayIn(person.timezone)}
                               value={row.date}
                               disabled={locked}
@@ -608,7 +652,7 @@ export function ImportScreenshots({
                         {invalid && (
                           <p className="import-issues">
                             Проверьте название, направление и дату. Начало
-                            учёта: {wallet.tracking_start_date}.
+                            учёта: {startDate}.
                           </p>
                         )}
                         {!!duplicates.length && (
@@ -718,7 +762,8 @@ export function ImportScreenshots({
                       disabled={locked}
                       onChange={(event) => setChecked(event.target.checked)}
                     />
-                    Я сверил выбранные суммы, даты, направления и категории
+                    Я сверил выбранные суммы, даты, направления и категории, а
+                    также счёт
                   </label>
                   <button
                     className="button primary"

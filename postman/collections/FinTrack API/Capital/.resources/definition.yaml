@@ -1,0 +1,5 @@
+{
+  "$kind": "collection",
+  "name": "Capital",
+  "description": "Eight capital/account/transfer methods from the authoritative OpenAPI. Set profile_id/account_id/transfer_id and current versions before executing writes."
+}

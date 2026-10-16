@@ -1,0 +1,8 @@
+{
+  "$kind": "http-request",
+  "name": "Exact total, cash/deposit and investment subtotals plus reconstructed daily history",
+  "description": "Exact total, cash/deposit and investment subtotals plus reconstructed daily history",
+  "order": 7000,
+  "method": "GET",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/capital"
+}

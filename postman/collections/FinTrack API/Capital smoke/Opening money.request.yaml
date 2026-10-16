@@ -1,0 +1,21 @@
+{
+  "$kind": "http-request",
+  "name": "Opening money",
+  "order": 3000,
+  "method": "PATCH",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/wallet",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 200',()=>pm.response.to.have.status(200));\n\n"
+    }
+  ],
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "type": "json",
+    "content": "{\n  \"version\": 1,\n  \"opening_balance_minor\": \"1000000\"\n}"
+  }
+}

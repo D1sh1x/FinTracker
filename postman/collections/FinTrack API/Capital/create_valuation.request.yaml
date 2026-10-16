@@ -1,0 +1,15 @@
+{
+  "$kind": "http-request",
+  "name": "Update investment value today. Expected balance detects concurrent money changes; revaluation never changes budgets",
+  "description": "Update investment value today. Expected balance detects concurrent money changes; revaluation never changes budgets",
+  "order": 8000,
+  "method": "POST",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/accounts/{{account_id}}/valuations",
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "type": "json",
+    "content": "{\n  \"id\": \"{{$guid}}\",\n  \"amount_minor\": \"0\",\n  \"expected_balance_minor\": \"0\",\n  \"version\": 1\n}"
+  }
+}

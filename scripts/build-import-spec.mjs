@@ -153,6 +153,17 @@ schemas.ScreenshotVersion = {
   required: ["version"],
   properties: { version: { type: "integer", minimum: 1 } },
 };
+if (schemas.Account) {
+  schemas.ScreenshotImport.properties.wallet_id = uuid;
+  schemas.ScreenshotImport.required.push("wallet_id");
+  schemas.ScreenshotEdit.properties.wallet_id = uuid;
+  schemas.ScreenshotConfirm.properties.wallet_id = {
+    type: "string",
+    format: "uuid",
+    description:
+      "Optional destination account for selected operations; omitted uses the saved draft account. Included in confirmation identity.",
+  };
+}
 const parameters = [{ name: "p", in: "path", required: true, schema: uuid }];
 const operation = (operationId, summary, method, body) => ({
   tags: ["Screenshot imports"],

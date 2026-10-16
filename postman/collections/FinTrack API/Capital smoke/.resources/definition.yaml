@@ -1,0 +1,5 @@
+{
+  "$kind": "collection",
+  "name": "Capital smoke",
+  "description": "Financial lifecycle against a dedicated test database only; creates one profile and financial records. Contract: api/openapi.json."
+}

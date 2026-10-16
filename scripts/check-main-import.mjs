@@ -45,6 +45,13 @@ try {
   expect(cats).toHaveLength(13);
   const capture = "2026-10-14"; // Explicit test assumption, not the original capture date.
   const wallet = await call(prefix + "/wallet");
+  const importAccount = await call(prefix + "/accounts", "POST", {
+    id: randomUUID(),
+    name: "Счёт импорта",
+    kind: "savings",
+    opening_balance_minor: "0",
+    tracking_start_date: "2026-10-01",
+  });
   await call(prefix + "/wallet", "PATCH", {
     tracking_start_date: "2026-10-01",
     version: wallet.version,
@@ -60,11 +67,9 @@ try {
   await expect(
     page.getByRole("heading", { name: "Перенесём операции из банка" }),
   ).toBeVisible();
-  await page
-    .context()
-    .grantPermissions(["clipboard-read", "clipboard-write"], {
-      origin: address,
-    });
+  await page.context().grantPermissions(["clipboard-read", "clipboard-write"], {
+    origin: address,
+  });
   const bytes = await readFile(imagePath);
   await page.evaluate(async (data) => {
     const blob = await (await fetch("data:image/png;base64," + data)).blob();
@@ -111,6 +116,9 @@ try {
   ).toHaveLength(3);
   expect((await call(prefix + "/transactions")).items).toHaveLength(0);
   const row = page.locator(".import-row").first();
+  await page
+    .getByLabel("Счёт для операций", { exact: true })
+    .selectOption(importAccount.id);
   await row.getByLabel("Название операции").fill("Продукты — проверено");
   // Native text paste must not be swallowed by the image handler.
   await page.evaluate(() =>
@@ -127,6 +135,9 @@ try {
     .click();
   await page.reload();
   await page.locator(".import-history button").first().click();
+  await expect(
+    page.getByLabel("Счёт для операций", { exact: true }),
+  ).toHaveValue(importAccount.id);
   await expect(
     page.locator(".import-row").first().getByLabel("Название операции"),
   ).toHaveValue("Продукты — проверено");
@@ -179,7 +190,7 @@ try {
   expect(budget.overspent_minor).toBe("1757");
   expect(
     (await call(prefix + "/transactions")).items.every(
-      (op) => op.source === "screenshot",
+      (op) => op.source === "screenshot" && op.wallet_id === importAccount.id,
     ),
   ).toBe(true);
   await page.locator("input[type=file]").setInputFiles(imagePath);
@@ -200,6 +211,7 @@ try {
       {
         profile_id: p,
         import_id: job.id,
+        wallet_id: importAccount.id,
         trusted_clipboard: true,
         text_paste: true,
         exact_amounts: true,

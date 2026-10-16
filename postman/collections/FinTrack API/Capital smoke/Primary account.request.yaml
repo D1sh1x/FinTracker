@@ -1,0 +1,14 @@
+{
+  "$kind": "http-request",
+  "name": "Primary account",
+  "order": 2000,
+  "method": "GET",
+  "url": "{{baseUrl}}/api/v1/profiles/{{profile_id}}/wallet",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 200',()=>pm.response.to.have.status(200));\n\npm.collectionVariables.set('primary_id',pm.response.json().id);"
+    }
+  ]
+}
