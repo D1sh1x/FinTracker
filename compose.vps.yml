@@ -1,0 +1,47 @@
+name: fintrack-vps
+
+services:
+  db:
+    cpus: 0.75
+    mem_limit: 512m
+    pids_limit: 128
+    shm_size: 128m
+
+  migrate:
+    image: fintrack-vps-api:${FINTRACK_VERSION:?Set FINTRACK_VERSION}
+    cpus: 0.5
+    mem_limit: 256m
+    pids_limit: 64
+
+  api:
+    image: fintrack-vps-api:${FINTRACK_VERSION:?Set FINTRACK_VERSION}
+    environment:
+      QWEN_URL: ${QWEN_URL:-http://127.0.0.1:8091}
+      GOMAXPROCS: "2"
+    cpus: 1.5
+    mem_limit: 768m
+    pids_limit: 128
+    security_opt: ["no-new-privileges:true"]
+
+  frontend:
+    image: fintrack-vps-web:${FINTRACK_VERSION:?Set FINTRACK_VERSION}
+    ports: !override
+      - "${HTTP_BIND:-127.0.0.1}:${HTTP_PORT:-8088}:80"
+    environment:
+      SITE_ADDRESS: ":80"
+      GOMAXPROCS: "1"
+    cpus: 0.25
+    mem_limit: 128m
+    pids_limit: 64
+    security_opt: ["no-new-privileges:true"]
+
+  backup:
+    cpus: 0.25
+    mem_limit: 256m
+    pids_limit: 64
+
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: ${FINTRACK_SUBNET:-10.203.88.0/24}
