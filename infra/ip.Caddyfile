@@ -1,0 +1,28 @@
+{
+  admin off
+  default_sni {$FINTRACK_PUBLIC_IP}
+  auto_https disable_redirects
+  servers {
+    protocols h1 h2
+  }
+}
+
+http://{$FINTRACK_PUBLIC_IP} {
+  redir https://{$FINTRACK_PUBLIC_IP}:{$FINTRACK_PUBLIC_PORT}{uri} 308
+}
+
+https://{$FINTRACK_PUBLIC_IP}:{$FINTRACK_PUBLIC_PORT} {
+  tls {
+    issuer acme {
+      dir {$FINTRACK_ACME_CA}
+      profile shortlived
+      disable_tlsalpn_challenge
+    }
+  }
+  basic_auth {
+    owner {$FINTRACK_ACCESS_HASH}
+  }
+  reverse_proxy frontend:80 {
+    header_up -Authorization
+  }
+}

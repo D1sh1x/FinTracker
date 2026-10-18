@@ -1,0 +1,31 @@
+services:
+  gateway:
+    image: fintrack-vps-web:${FINTRACK_VERSION:?Set FINTRACK_VERSION}
+    command: ["caddy", "run", "--config", "/etc/caddy/ip.Caddyfile", "--adapter", "caddyfile"]
+    environment:
+      FINTRACK_PUBLIC_IP: ${FINTRACK_PUBLIC_IP:?Set FINTRACK_PUBLIC_IP}
+      FINTRACK_PUBLIC_PORT: ${FINTRACK_PUBLIC_PORT:-9443}
+      FINTRACK_ACME_CA: ${FINTRACK_ACME_CA:-https://acme-v02.api.letsencrypt.org/directory}
+      FINTRACK_ACCESS_HASH: ${FINTRACK_ACCESS_HASH:?Set FINTRACK_ACCESS_HASH}
+      GOMAXPROCS: "1"
+    ports:
+      - "${FINTRACK_PUBLIC_IP}:80:80"
+      - "${FINTRACK_PUBLIC_IP}:${FINTRACK_PUBLIC_PORT:-9443}:${FINTRACK_PUBLIC_PORT:-9443}"
+    volumes:
+      - ./infra/ip.Caddyfile:/etc/caddy/ip.Caddyfile:ro
+      - ip_tls_data:/data
+      - ip_tls_config:/config
+    depends_on:
+      frontend: { condition: service_started }
+    cpus: 0.25
+    mem_limit: 128m
+    pids_limit: 64
+    security_opt: ["no-new-privileges:true"]
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+
+volumes:
+  ip_tls_data:
+  ip_tls_config:

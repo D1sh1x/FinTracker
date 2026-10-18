@@ -6,4 +6,7 @@ backups/
 playwright-report/
 test-results/
 *.tsbuildinfo
+artifacts/
+*.jks
+*.keystore
 debug.log

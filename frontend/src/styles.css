@@ -64,6 +64,53 @@ body {
   background: var(--bg);
   color: var(--text);
 }
+.connection-shell {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 22px;
+  gap: 30px;
+}
+.connection-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 23px;
+}
+.connection-card {
+  width: 100%;
+  max-width: 460px;
+}
+.connection-card h1 {
+  font-size: 28px;
+  margin: 14px 0;
+}
+.connection-card > p {
+  color: var(--muted);
+  line-height: 1.8;
+}
+.connection-card .eyebrow {
+  display: block;
+  margin-top: 18px;
+}
+.connection-card form {
+  margin-top: 24px;
+}
+.connection-card input {
+  font-size: 16px;
+}
+.connection-card .button {
+  width: 100%;
+}
+.mobile-server-button {
+  margin-top: 12px;
+}
+.settings-grid > .mobile-server-button {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
 button,
 input,
 select,

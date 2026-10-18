@@ -1,0 +1,5 @@
+simulation: fintrack-android-connection
+routing: path
+mocks:
+  - routeKey: api
+    path: ../mocks/mobile-connection/config.yaml

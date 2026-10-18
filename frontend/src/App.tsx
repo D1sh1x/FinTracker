@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { CategoryBudgetsPanel } from "./CategoryBudgets";
 import { ImportScreenshots } from "./ImportScreenshots";
 import { CapitalPage } from "./Capital";
+import { MobileServerButton } from "./MobileRoot";
+import { apiFetch, applySystemTheme, saveCsv } from "./mobile";
 import type { FormEvent } from "react";
 import {
   useInfiniteQuery,
@@ -160,6 +162,10 @@ export default function App() {
     const apply = () => {
       document.documentElement.dataset.theme =
         theme === "system" ? (media.matches ? "dark" : "light") : theme;
+      applySystemTheme(
+        theme,
+        document.documentElement.dataset.theme === "dark",
+      );
     };
     apply();
     media.addEventListener("change", apply);
@@ -186,6 +192,7 @@ export default function App() {
       <div className="welcome-shell">
         <Brand />
         <LoadError error={profiles.error} onRetry={() => profiles.refetch()} />
+        <MobileServerButton />
       </div>
     );
   return (
@@ -225,6 +232,7 @@ export default function App() {
               Создать профиль
             </button>
             <span className="welcome-note">Без регистрации и лишних шагов</span>
+            <MobileServerButton />
           </div>
           <div className="welcome-art" aria-hidden="true">
             <div className="art-orbit orbit-one" />
@@ -354,9 +362,11 @@ function Workspace({
   async function download(filters: Record<string, string | undefined> = {}) {
     setDownloadError(null);
     try {
-      const response = await fetch(
+      const response = await apiFetch(
         `/api/v1${prefix}/exports/transactions.csv?${queryString(filters)}`,
         { signal: AbortSignal.timeout(60_000) },
+        undefined,
+        60_000,
       );
       if (!response.ok) {
         const body = await response.json().catch(() => null);
@@ -364,12 +374,10 @@ function Workspace({
           body?.error?.message ?? "Не удалось выгрузить операции",
         );
       }
-      const url = URL.createObjectURL(await response.blob());
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `fintrack-${person.name.replace(/[^\p{L}\p{N}-]/gu, "_")}.csv`;
-      link.click();
-      URL.revokeObjectURL(url);
+      await saveCsv(
+        `fintrack-${person.name.replace(/[^\p{L}\p{N}-]/gu, "_")}.csv`,
+        await response.blob(),
+      );
     } catch (e) {
       setDownloadError(
         e instanceof TypeError
@@ -1320,6 +1328,7 @@ function Settings({
   }
   return (
     <div className="settings-grid">
+      <MobileServerButton />
       <section className="panel">
         <div className="panel-heading">
           <div>

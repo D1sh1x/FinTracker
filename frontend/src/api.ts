@@ -1,4 +1,5 @@
 import type { components } from "./generated/api";
+import { apiFetch } from "./mobile";
 
 export type Profile = components["schemas"]["ProfileOut"];
 export type Wallet = components["schemas"]["WalletOut"];
@@ -32,7 +33,7 @@ export async function request<T>(
 ): Promise<T> {
   let response: Response;
   try {
-    response = await fetch("/api/v1" + path, {
+    response = await apiFetch("/api/v1" + path, {
       ...options,
       signal: options.signal
         ? AbortSignal.any([options.signal, AbortSignal.timeout(20_000)])

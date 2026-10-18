@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ApiError } from "./api";
 import App from "./App";
+import { MobileRoot } from "./MobileRoot";
 import "./styles.css";
 import "@fontsource-variable/manrope";
 
@@ -21,7 +22,9 @@ const client = new QueryClient({
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={client}>
-      <App />
+      <MobileRoot>
+        <App />
+      </MobileRoot>
     </QueryClientProvider>
   </React.StrictMode>,
 );

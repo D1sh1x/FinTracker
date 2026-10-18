@@ -22,6 +22,7 @@ import {
 import { FormError, Loading, LoadError } from "./components";
 import { formatMoney, moneyInput, parseMoney, todayIn } from "./money";
 import { newId } from "./id";
+import { clipboardImage, nativeApp } from "./mobile";
 import "./imports.css";
 
 type ReviewRow = {
@@ -75,6 +76,7 @@ export function ImportScreenshots({
   const [dirty, setDirty] = useState(false);
   const [checked, setChecked] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [pasting, setPasting] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [pending, setPending] = useState<Confirmation | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -99,7 +101,7 @@ export function ImportScreenshots({
   const job = draft.data;
   const processing = job?.status === "queued" || job?.status === "processing";
   const editable = job?.status === "ready";
-  const locked = busy || !!pending;
+  const locked = busy || pasting || !!pending;
   useEffect(() => {
     active.current = true;
     return () => {
@@ -138,7 +140,7 @@ export function ImportScreenshots({
     );
   }, [job, dirty]);
   const choose = (next: File | null) => {
-    if (busy || pending || processing) {
+    if (busy || pasting || pending || processing) {
       setError(
         new Error(
           "Дождитесь завершения текущего действия или отмените распознавание.",
@@ -174,7 +176,28 @@ export function ImportScreenshots({
     };
     document.addEventListener("paste", paste);
     return () => document.removeEventListener("paste", paste);
-  }, [busy, pending, processing]);
+  }, [busy, pasting, pending, processing]);
+  async function pasteNativeImage() {
+    setPasting(true);
+    try {
+      const image = await clipboardImage();
+      if (active.current) {
+        choose(image);
+        if (fileInput.current) fileInput.current.value = "";
+      }
+    } catch (failure) {
+      if (active.current)
+        setError(
+          new Error(
+            failure instanceof Error
+              ? failure.message
+              : "Не удалось прочитать буфер. Выберите файл.",
+          ),
+        );
+    } finally {
+      if (active.current) setPasting(false);
+    }
+  }
   useEffect(() => {
     if (!dirty && !pending) return;
     const prevent = (event: BeforeUnloadEvent) => event.preventDefault();
@@ -368,8 +391,10 @@ export function ImportScreenshots({
           <span className="eyebrow">СКРИНШОТ → ПРОВЕРКА → ОПЕРАЦИИ</span>
           <h2>Перенесём операции из банка</h2>
           <p>
-            Загрузите PNG/JPEG или вставьте изображение через Ctrl+V. Все суммы
-            — в рублях. Проверьте результат перед сохранением.
+            {nativeApp
+              ? "Выберите PNG/JPEG или вставьте скриншот из буфера."
+              : "Загрузите PNG/JPEG или вставьте изображение через Ctrl+V."}{" "}
+            Все суммы — в рублях. Проверьте результат перед сохранением.
           </p>
         </div>
         <label className="import-file">
@@ -382,8 +407,19 @@ export function ImportScreenshots({
             disabled={locked || processing}
             onChange={(event) => choose(event.target.files?.[0] ?? null)}
           />
-          <small>Или Ctrl+V · до 10 МБ / 20 Мп</small>
+          <small>
+            {nativeApp ? "До 10 МБ / 20 Мп" : "Или Ctrl+V · до 10 МБ / 20 Мп"}
+          </small>
         </label>
+        {nativeApp && (
+          <button
+            className="button secondary"
+            onClick={pasteNativeImage}
+            disabled={locked || processing}
+          >
+            {pasting ? "Читаем буфер…" : "Вставить из буфера"}
+          </button>
+        )}
         {preview && (
           <img
             className="import-preview"
