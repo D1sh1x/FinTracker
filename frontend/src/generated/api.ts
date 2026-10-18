@@ -457,6 +457,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/profiles/{p}/notification-imports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Import a WB Bank purchase notification exactly once
+         * @description Android filters the sender package. Server accepts only a strict RUB purchase format. id is a durable device event UUID; the same id with changed payload/profile conflicts. Different event IDs with equal amounts remain distinct. posted_at is converted to the profile timezone. Unknown categories fall back to Не определено. No raw text is persisted on the server. Existing screenshot/manual duplicates require manual reconciliation.
+         */
+        post: operations["import_wb_notification"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -762,7 +782,7 @@ export interface components {
              * Source
              * @enum {string}
              */
-            source: "manual" | "screenshot";
+            source: "manual" | "screenshot" | "notification";
             /** Version */
             version: number;
             /**
@@ -1096,6 +1116,25 @@ export interface components {
             accounts: components["schemas"]["Account"][];
             history: components["schemas"]["CapitalPoint"][];
             valuations: components["schemas"]["Valuation"][];
+        };
+        NotificationImportCreate: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            wallet_id: string;
+            /** @constant */
+            package_name: "ru.wildberries.bank";
+            text: string;
+            /** Format: date-time */
+            posted_at: string;
+        };
+        NotificationReceipt: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            transaction_id: string;
+            /** @constant */
+            status: "imported";
         };
     };
     responses: never;
@@ -4350,6 +4389,86 @@ export interface operations {
                 };
             };
             /** @description Service unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+        };
+    };
+    import_wb_notification: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                p: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NotificationImportCreate"];
+            };
+        };
+        responses: {
+            /** @description Purchase imported. Replays return the original receipt, even after editing/deleting the transaction. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationReceipt"];
+                };
+            };
+            /** @description Purchase imported. Replays return the original receipt, even after editing/deleting the transaction. */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationReceipt"];
+                };
+            };
+            /** @description Request rejected */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Request rejected */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Request rejected */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Request rejected */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorOut"];
+                };
+            };
+            /** @description Request rejected */
             503: {
                 headers: {
                     [name: string]: unknown;

@@ -73,6 +73,14 @@ body {
   padding: 28px 22px;
   gap: 30px;
 }
+.bank-settings { grid-column: 1 / -1; min-width: 0; }
+.bank-settings > label { display: grid; gap: 8px; margin-top: 18px; }
+.bank-settings > .button-row { margin-top: 18px; flex-wrap: wrap; }
+.bank-settings .button { max-width: 100%; white-space: normal; }
+.bank-events { padding: 0; list-style: none; }
+.bank-events li { padding: 18px 0; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
+.bank-events time { display: block; color: var(--muted); font-size: 13px; margin-top: 6px; }
+.bank-events p { margin: 8px 0; }
 .connection-brand {
   display: flex;
   align-items: center;

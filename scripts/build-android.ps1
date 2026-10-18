@@ -1,7 +1,7 @@
 param(
     [ValidateSet('Debug', 'Release')][string]$Configuration = 'Release',
-    [ValidateRange(1, 2100000000)][int]$VersionCode = 1,
-    [ValidatePattern('^[0-9A-Za-z.\-]+$')][string]$VersionName = '0.1.0-alpha',
+    [ValidateRange(1, 2100000000)][int]$VersionCode = 2,
+    [ValidatePattern('^[0-9A-Za-z.\-]+$')][string]$VersionName = '0.2.0-alpha',
     [string]$JavaHome = $env:JAVA_HOME,
     [string]$SdkRoot = $env:ANDROID_HOME,
     [switch]$Verify,

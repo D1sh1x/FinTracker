@@ -1,0 +1,21 @@
+{
+  "$kind": "http-request",
+  "name": "Reject Mir Pay",
+  "order": 8000,
+  "method": "POST",
+  "url": "{{baseUrl}}/api/v1/profiles/{{push_profile}}/notification-imports",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 422',()=>pm.response.to.have.status(422));\n"
+    }
+  ],
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "type": "json",
+    "content": "{\n  \"id\": \"{{$guid}}\",\n  \"wallet_id\": \"{{push_wallet}}\",\n  \"package_name\": \"ru.nspk.mirpay\",\n  \"posted_at\": \"{{push_time}}\",\n  \"text\": \"Покупка 43 ₽ по карте *7055 Транспорт Краснодара. Доступно 933,48 ₽\"\n}"
+  }
+}

@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { App as AndroidApp } from "@capacitor/app";
 import { Server, Wallet, ArrowLeft } from "lucide-react";
 import { FormError, Loading } from "./components";
+import { bankNotifications } from "./BankNotifications";
 import {
   apiFetch,
   currentServer,
@@ -38,6 +39,17 @@ export function MobileRoot({ children }: { children: ReactNode }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<Error | null>(null);
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (!nativeApp) return;
+    const listener = AndroidApp.addListener("appStateChange", ({ isActive }) => {
+      if (isActive) {
+        void client.invalidateQueries();
+        void bankNotifications.sync().catch(() => {});
+      }
+    });
+    return () => { void listener.then(handle => handle.remove()); };
+  }, [client]);
 
   useEffect(() => {
     if (!nativeApp) return;
@@ -133,6 +145,7 @@ export function MobileRoot({ children }: { children: ReactNode }) {
         throw new Error("По этому адресу не найден API ФинТрека.");
       await device.saveConnection(next);
       const changed = currentServer() !== next.url;
+      if (changed) await bankNotifications.configure({ enabled: false });
       await client.cancelQueries();
       client.clear();
       if (changed) {

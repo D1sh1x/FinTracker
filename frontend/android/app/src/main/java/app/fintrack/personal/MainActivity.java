@@ -7,6 +7,7 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(FintrackDevicePlugin.class);
+        registerPlugin(BankNotificationsPlugin.class);
         super.onCreate(savedInstanceState);
     }
 }

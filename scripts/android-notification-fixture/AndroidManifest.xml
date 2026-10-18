@@ -1,0 +1,7 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="ru.wildberries.bank">
+    <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="36" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <application android:label="WB TEST FIXTURE" android:theme="@android:style/Theme.Material.Light.NoActionBar">
+        <activity android:name="fixture.MainActivity" android:exported="true" />
+    </application>
+</manifest>

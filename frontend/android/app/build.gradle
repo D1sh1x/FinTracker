@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
-def fintrackBuildVersionCode = Integer.parseInt(project.findProperty('fintrackVersionCode') ?: '1')
-def fintrackBuildVersionName = project.findProperty('fintrackVersionName') ?: '0.1.0-alpha'
+def fintrackBuildVersionCode = Integer.parseInt(project.findProperty('fintrackVersionCode') ?: '2')
+def fintrackBuildVersionName = project.findProperty('fintrackVersionName') ?: '0.2.0-alpha'
 
 android {
     namespace = "app.fintrack.personal"

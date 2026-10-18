@@ -1,0 +1,5 @@
+{
+  "$kind": "collection",
+  "name": "Notification smoke",
+  "description": "Writes synthetic WB purchases; run only against an isolated test database."
+}

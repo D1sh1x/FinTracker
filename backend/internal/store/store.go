@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	CurrentVersion = "0005"
-	MigrationCount = 5
+	CurrentVersion = "0006"
+	MigrationCount = 6
 )
 
 //go:embed 0001.sql
@@ -28,6 +28,9 @@ var screenshotSchema string
 
 //go:embed 0005.sql
 var capitalSchema string
+
+//go:embed 0006.sql
+var notificationSchema string
 
 type migration struct{ version, sql string }
 
@@ -68,7 +71,7 @@ func Migrate(ctx context.Context, pool *pgxpool.Pool) error {
 	if _, err = tx.Exec(ctx, "CREATE TABLE IF NOT EXISTS schema_migrations (version TEXT PRIMARY KEY, applied_at TIMESTAMPTZ NOT NULL DEFAULT now())"); err != nil {
 		return err
 	}
-	for _, step := range []migration{{"0001", initialSchema}, {"0002", budgetDeletionSchema}, {"0003", categoryBudgetSchema}, {"0004", screenshotSchema}, {"0005", capitalSchema}} {
+	for _, step := range []migration{{"0001", initialSchema}, {"0002", budgetDeletionSchema}, {"0003", categoryBudgetSchema}, {"0004", screenshotSchema}, {"0005", capitalSchema}, {"0006", notificationSchema}} {
 		var applied bool
 		if err = tx.QueryRow(ctx, "SELECT EXISTS(SELECT 1 FROM schema_migrations WHERE version=$1)", step.version).Scan(&applied); err != nil {
 			return err

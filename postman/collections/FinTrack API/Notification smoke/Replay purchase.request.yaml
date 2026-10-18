@@ -1,0 +1,21 @@
+{
+  "$kind": "http-request",
+  "name": "Replay purchase",
+  "order": 4000,
+  "method": "POST",
+  "url": "{{baseUrl}}/api/v1/profiles/{{push_profile}}/notification-imports",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 200',()=>pm.response.to.have.status(200));\npm.test('Stable receipt',()=>pm.expect(pm.response.json().transaction_id).to.eql(pm.collectionVariables.get('push_transaction')));"
+    }
+  ],
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "type": "json",
+    "content": "{\n  \"id\": \"{{push_id}}\",\n  \"wallet_id\": \"{{push_wallet}}\",\n  \"package_name\": \"ru.wildberries.bank\",\n  \"posted_at\": \"{{push_time}}\",\n  \"text\": \"Покупка 43 ₽ по карте *7055 Транспорт Краснодара. Доступно 933,48 ₽\"\n}"
+  }
+}

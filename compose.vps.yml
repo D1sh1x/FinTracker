@@ -8,13 +8,13 @@ services:
     shm_size: 128m
 
   migrate:
-    image: fintrack-vps-api:${FINTRACK_VERSION:?Set FINTRACK_VERSION}
+    image: fintrack-vps-api:${FINTRACK_API_VERSION:-${FINTRACK_VERSION:?Set FINTRACK_VERSION}}
     cpus: 0.5
     mem_limit: 256m
     pids_limit: 64
 
   api:
-    image: fintrack-vps-api:${FINTRACK_VERSION:?Set FINTRACK_VERSION}
+    image: fintrack-vps-api:${FINTRACK_API_VERSION:-${FINTRACK_VERSION:?Set FINTRACK_VERSION}}
     environment:
       QWEN_URL: ${QWEN_URL:-http://127.0.0.1:8091}
       GOMAXPROCS: "2"

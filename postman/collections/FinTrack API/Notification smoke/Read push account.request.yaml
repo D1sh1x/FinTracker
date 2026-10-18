@@ -1,0 +1,14 @@
+{
+  "$kind": "http-request",
+  "name": "Read push account",
+  "order": 2000,
+  "method": "GET",
+  "url": "{{baseUrl}}/api/v1/profiles/{{push_profile}}/wallet",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 200',()=>pm.response.to.have.status(200));\npm.collectionVariables.set('push_wallet',pm.response.json().id);"
+    }
+  ]
+}

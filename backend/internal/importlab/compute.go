@@ -5,6 +5,10 @@ import (
 	"time"
 )
 
+func (s *Server) Classify(ctx context.Context, rows []Row) {
+	s.classify(ctx, rows)
+}
+
 func (s *Server) Compute(ctx context.Context, data []byte, captured string) (Result, error) {
 	started := time.Now()
 	text, lines, err := s.OCR(ctx, data)

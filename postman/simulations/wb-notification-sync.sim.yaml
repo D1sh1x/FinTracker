@@ -1,0 +1,5 @@
+simulation: fintrack-wb-notification-sync
+routing: path
+mocks:
+  - routeKey: api
+    path: ../mocks/wb-notification-sync/config.yaml

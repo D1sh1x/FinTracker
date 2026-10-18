@@ -3,6 +3,7 @@ import { CategoryBudgetsPanel } from "./CategoryBudgets";
 import { ImportScreenshots } from "./ImportScreenshots";
 import { CapitalPage } from "./Capital";
 import { MobileServerButton } from "./MobileRoot";
+import { BankNotifications } from "./BankNotifications";
 import { apiFetch, applySystemTheme, saveCsv } from "./mobile";
 import type { FormEvent } from "react";
 import {
@@ -1329,6 +1330,7 @@ function Settings({
   return (
     <div className="settings-grid">
       <MobileServerButton />
+      <BankNotifications person={person} />
       <section className="panel">
         <div className="panel-heading">
           <div>

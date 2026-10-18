@@ -1,0 +1,21 @@
+{
+  "$kind": "http-request",
+  "name": "Changed payload conflicts",
+  "order": 6000,
+  "method": "POST",
+  "url": "{{baseUrl}}/api/v1/profiles/{{push_profile}}/notification-imports",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 409',()=>pm.response.to.have.status(409));\n"
+    }
+  ],
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "type": "json",
+    "content": "{\n  \"id\": \"{{push_id}}\",\n  \"wallet_id\": \"{{push_wallet}}\",\n  \"package_name\": \"ru.wildberries.bank\",\n  \"posted_at\": \"{{push_time}}\",\n  \"text\": \"Покупка 44 ₽ по карте *7055 Магнит\"\n}"
+  }
+}

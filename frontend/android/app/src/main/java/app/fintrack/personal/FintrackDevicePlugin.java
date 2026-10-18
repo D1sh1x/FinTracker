@@ -33,7 +33,7 @@ public class FintrackDevicePlugin extends Plugin {
     private static final String KEY_ALIAS = "fintrack_connection_key";
     private static final int GCM_TAG_BITS = 128;
 
-    private SecretKey secretKey() throws Exception {
+    private static SecretKey secretKey() throws Exception {
         KeyStore store = KeyStore.getInstance("AndroidKeyStore");
         store.load(null);
         if (store.containsAlias(KEY_ALIAS)) return (SecretKey) store.getKey(KEY_ALIAS, null);
@@ -48,21 +48,24 @@ public class FintrackDevicePlugin extends Plugin {
     @PluginMethod
     public void readConnection(PluginCall call) {
         try {
-            String stored = getContext().getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE).getString("encrypted", null);
-            if (stored == null) {
-                JSObject empty = new JSObject();
-                empty.put("url", ""); empty.put("username", ""); empty.put("password", "");
-                call.resolve(empty);
-                return;
-            }
-            String[] parts = stored.split(":", 2);
-            Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-            cipher.init(Cipher.DECRYPT_MODE, secretKey(), new GCMParameterSpec(GCM_TAG_BITS, Base64.decode(parts[0], Base64.NO_WRAP)));
-            String json = new String(cipher.doFinal(Base64.decode(parts[1], Base64.NO_WRAP)), StandardCharsets.UTF_8);
-            call.resolve(new JSObject(json));
+            call.resolve(loadConnection(getContext()));
         } catch (Exception failure) {
             call.reject("Не удалось прочитать настройки подключения.");
         }
+    }
+
+    static JSObject loadConnection(Context context) throws Exception {
+        String stored = context.getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE).getString("encrypted", null);
+        if (stored == null) {
+            JSObject empty = new JSObject();
+            empty.put("url", ""); empty.put("username", ""); empty.put("password", "");
+            return empty;
+        }
+        String[] parts = stored.split(":", 2);
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        cipher.init(Cipher.DECRYPT_MODE, secretKey(), new GCMParameterSpec(GCM_TAG_BITS, Base64.decode(parts[0], Base64.NO_WRAP)));
+        String json = new String(cipher.doFinal(Base64.decode(parts[1], Base64.NO_WRAP)), StandardCharsets.UTF_8);
+        return new JSObject(json);
     }
 
     @PluginMethod

@@ -199,6 +199,7 @@ func (s *Server) NewHandler() http.Handler {
 		"PATCH /api/v1/profiles/{p}/categories/{id}":                s.patchCategory,
 		"GET /api/v1/profiles/{p}/transactions":                     s.listOperations,
 		"POST /api/v1/profiles/{p}/transactions":                    s.createOperation,
+		"POST /api/v1/profiles/{p}/notification-imports":            s.importNotification,
 		"GET /api/v1/profiles/{p}/transactions/{id}":                s.getOperation,
 		"PATCH /api/v1/profiles/{p}/transactions/{id}":              s.patchOperation,
 		"DELETE /api/v1/profiles/{p}/transactions/{id}":             s.deleteOperation,

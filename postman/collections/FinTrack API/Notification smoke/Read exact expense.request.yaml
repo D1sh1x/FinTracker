@@ -1,0 +1,14 @@
+{
+  "$kind": "http-request",
+  "name": "Read exact expense",
+  "order": 5000,
+  "method": "GET",
+  "url": "{{baseUrl}}/api/v1/profiles/{{push_profile}}/transactions/{{push_transaction}}",
+  "scripts": [
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 200',()=>pm.response.to.have.status(200));\npm.test('Exact amount, source and merchant',()=>{const t=pm.response.json();pm.expect(t.amount_minor).to.eql('4300');pm.expect(t.source).to.eql('notification');pm.expect(t.note).to.eql('Транспорт Краснодара');});"
+    }
+  ]
+}

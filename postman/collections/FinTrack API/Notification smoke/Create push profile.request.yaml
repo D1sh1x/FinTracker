@@ -1,0 +1,26 @@
+{
+  "$kind": "http-request",
+  "name": "Create push profile",
+  "order": 1000,
+  "method": "POST",
+  "url": "{{baseUrl}}/api/v1/profiles",
+  "scripts": [
+    {
+      "type": "beforeRequest",
+      "language": "text/javascript",
+      "code": "['push_profile','push_id'].forEach(k=>pm.collectionVariables.set(k,pm.variables.replaceIn('{{$guid}}')));pm.collectionVariables.set('push_time',new Date().toISOString());"
+    },
+    {
+      "type": "afterResponse",
+      "language": "text/javascript",
+      "code": "pm.test('HTTP 201',()=>pm.response.to.have.status(201));\n"
+    }
+  ],
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "body": {
+    "type": "json",
+    "content": "{\n  \"id\": \"{{push_profile}}\",\n  \"name\": \"WB notification smoke\"\n}"
+  }
+}
